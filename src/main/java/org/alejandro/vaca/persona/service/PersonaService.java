@@ -1,6 +1,8 @@
 package org.alejandro.vaca.persona.service;
 
+import com.google.cloud.firestore.Firestore;
 import java.util.List;
+import org.alejandro.vaca.persona.config.FirebaseConfig;
 import org.alejandro.vaca.persona.model.PersonaModel;
 import org.alejandro.vaca.persona.repository.PersonaRepository;
 import org.springframework.stereotype.Service;
@@ -8,10 +10,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class PersonaService {
     
+    private final Firestore firestore;
+    private final FirebaseConfig firebaseConfig;
     private final PersonaRepository personaRepository;
 
-    public PersonaService(PersonaRepository personaRepository) {
+    public PersonaService(PersonaRepository personaRepository, FirebaseConfig firebaseConfig, Firestore firestore) {
         this.personaRepository = personaRepository;
+        this.firebaseConfig = firebaseConfig;
+        this.firestore = firestore;
     }
 
     public List<PersonaModel> getPersonasPorNombre(String nombre,String apellidoP,String apellidoM) {
@@ -58,5 +64,16 @@ public class PersonaService {
 
     public void eliminarPersonaPorRfc(String rfc) {
         personaRepository.deletePersonaPorRFC(rfc);
+    }
+    public void crearCurp(PersonaModel personaModel){
+       personaRepository.crearCurp(personaModel);
+      
+    }
+    public void crearRFC(PersonaModel personaModel){
+        personaRepository.crearRFC(personaModel);
+      
+    }
+    public void  calcularIMC(Double peso, Double estatura){
+        personaRepository.calcularIMC(peso, estatura);  
     }
 }

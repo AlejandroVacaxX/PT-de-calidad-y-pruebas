@@ -72,7 +72,10 @@ public class PersonaRepository {
                             persona.estatura(),
                             persona.peso(),
                             persona.telefono(),
-                            persona.email()
+                            persona.email(),
+                            document.getString("curp"),
+                            document.getString("rfc"),
+                            document.getDouble("imc")
 
                     ));
 
@@ -172,21 +175,23 @@ public class PersonaRepository {
         return raiz;
     }
 
-    public void crearCurp(PersonaModel persona) {
+    public String crearCurp(PersonaModel persona) {
         validarPersona(persona);
         try {
             String curpGenerada = generarCurp(persona);
             System.out.println("CURP Generada: " + curpGenerada);
+            return curpGenerada;
         } catch (Exception e) {
             throw new RuntimeException("No fue posible generar la CURP por el error: " + e.getMessage(), e);
         }
     }
 
-    public void crearRFC(PersonaModel persona) {
+    public String  crearRFC(PersonaModel persona) {
         validarPersona(persona);
         try {
             String rfcGenerado = generarRfc(persona);
             System.out.println("RFC Generado: " + rfcGenerado);
+            return rfcGenerado;
         } catch (Exception e) {
             throw new RuntimeException("No fue posible generar el RFC por el error: " + e.getMessage(), e);
         }
@@ -214,7 +219,11 @@ public class PersonaRepository {
                             persona.estatura(),
                             persona.peso(),
                             persona.telefono(),
-                            persona.email()));
+                            persona.email(),
+                            persona.curp(),
+                            persona.rfc(),
+                            persona.imc()
+                            ));
 
                 } else {
                     System.out.println("No se encontro persona con el curp: " + curp);
@@ -250,7 +259,10 @@ public class PersonaRepository {
                             persona.estatura(),
                             persona.peso(),
                             persona.telefono(),
-                            persona.email()));
+                            persona.email(),
+                            persona.curp(),
+                            persona.rfc(),
+                            persona.imc()));
 
                 } else {
                     System.out.println("No se encontro persona con el rfc: " + rfc);
@@ -342,7 +354,10 @@ public class PersonaRepository {
                     personaActualizada.estatura(),
                     personaActualizada.peso(),
                     personaActualizada.telefono(),
-                    personaActualizada.email());
+                    personaActualizada.email(),
+                    document.getString("curp"),
+                    document.getString("rfc"),
+                    document.getDouble("imc"));
 
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(
@@ -394,7 +409,10 @@ public class PersonaRepository {
                         document.getDouble("estatura"),
                         document.getDouble("peso"),
                         document.getString("telefono"),
-                        document.getString("email")
+                        document.getString("email"),
+                        document.getString("curp"),
+                        document.getString("rfc"),
+                        document.getDouble("imc")
                 ));
             }
             
@@ -411,22 +429,34 @@ public class PersonaRepository {
 
     public PersonaModel guardar(PersonaModel persona) {
         try {
-            CollectionReference collectionReference = firestore.collection(COLLECTION);
-            DocumentReference documentReference = firestore.collection(COLLECTION).document();
-            @SuppressWarnings("null")
-            ApiFuture<WriteResult> future = documentReference.set(Map.of(
-                    "nombre", persona.nombre(),
-                    "apellidoPaterno", persona.apellidoPaterno(),
-                    "apellidoMaterno", persona.apellidoMaterno(),
-                    "fechaDeNacimiento", persona.fechaDeNacimiento(),
-                    "genero", persona.genero(),
-                    "estatusMigratorio", persona.estatusMigratorio(),
-                    "estatura", persona.estatura(),
-                    "peso", persona.peso(),
-                    "telefono", persona.telefono(),
-                    "email", persona.email()));
+            // 1. Calculamos los datos usando los métodos que ya tienes en el Repositorio
+            String curpCalculado = generarCurp(persona);
+            String rfcCalculado = generarRfc(persona);
+            Double imcCalculado = calcularIMC(persona.peso(), persona.estatura());
 
+            DocumentReference documentReference = firestore.collection(COLLECTION).document();
+            
+            // 2. Usamos HashMap porque Map.of explota si le pasas más de 10 datos
+            Map<String, Object> datos = new java.util.HashMap<>();
+            datos.put("nombre", persona.nombre());
+            datos.put("apellidoPaterno", persona.apellidoPaterno());
+            datos.put("apellidoMaterno", persona.apellidoMaterno());
+            datos.put("fechaDeNacimiento", persona.fechaDeNacimiento());
+            datos.put("genero", persona.genero());
+            datos.put("estatusMigratorio", persona.estatusMigratorio());
+            datos.put("estatura", persona.estatura());
+            datos.put("peso", persona.peso());
+            datos.put("telefono", persona.telefono());
+            datos.put("email", persona.email());
+            // Agregamos los calculados
+            datos.put("curp", curpCalculado);
+            datos.put("rfc", rfcCalculado);
+            datos.put("imc", imcCalculado);
+
+            ApiFuture<WriteResult> future = documentReference.set(datos);
             future.get();
+            
+            // 3. Retornamos el objeto con todos sus datos completos
             return new PersonaModel(
                     documentReference.getId(),
                     persona.nombre(),
@@ -438,7 +468,11 @@ public class PersonaRepository {
                     persona.estatura(),
                     persona.peso(),
                     persona.telefono(),
-                    persona.email());
+                    persona.email(),
+                    curpCalculado,
+                    rfcCalculado,
+                    imcCalculado
+            );
         } catch (Exception e) {
             throw new RuntimeException("No fue posible guardar la persona por el error: " + e);
         }
