@@ -35,8 +35,14 @@ public class PersonaRepository {
     }
 
     public Double calcularIMC(Double peso, Double estatura) {
+        if (estatura == null || estatura <= 0) return 0.0;
+        double imc = peso / (estatura * estatura);
+        return Math.round(imc * 100.0) / 100.0;
+    }
 
-        return peso * (estatura * estatura);
+    private Double redondear(Double valor) {
+        if (valor == null) return 0.0;
+        return Math.round(valor * 100.0) / 100.0;
     }
 
     public Optional<PersonaModel> obtenerPorId(String id) {
@@ -328,24 +334,26 @@ public class PersonaRepository {
 
 
     public PersonaModel actualizarPersonaPorId(String id, PersonaModel personaActualizada) {
+        System.out.println("Los datos de la persona con el ID: " + id + "Fueron actualizados exitosamente");
         return ejecutarActualizacionBase(id, personaActualizada, "ID");
     }
-    // --- ACTUALIZACIONES ---
+
     public PersonaModel actualizarPersonaPorCurp(String curp, PersonaModel personaActualizada) {
-        // 1. Buscamos a la persona con tu método que ya funciona
+
         PersonaModel persona = getPersonaPorCurp(curp)
                 .orElseThrow(() -> new RuntimeException("No se encontró a nadie con el CURP: " + curp));
-        // 2. Usamos su ID real para la actualización base
+                System.out.println("Los datos de la persona con el CURP: " + curp + "Fueron actualizados exitosamente");
         return ejecutarActualizacionBase(persona.id(), personaActualizada, "CURP");
     }
 
     public PersonaModel actualizarPersonaPorRFC(String rfc, PersonaModel personaActualizada) {
         PersonaModel persona = getPersonaPorRFC(rfc)
                 .orElseThrow(() -> new RuntimeException("No se encontró a nadie con el RFC: " + rfc));
+                System.out.println("Los datos de la persona con el RFC: " + rfc + "Fueron actualizados exitosamente");
         return ejecutarActualizacionBase(persona.id(), personaActualizada, "RFC");
     }
 
-    // --- ELIMINACIONES ---
+    
     public void deletePersonaPorRFC(String rfc) {
         PersonaModel persona = getPersonaPorRFC(rfc)
                 .orElseThrow(() -> new RuntimeException("No se encontró a nadie con el RFC: " + rfc));
@@ -361,25 +369,25 @@ public class PersonaRepository {
 
 
     public List<PersonaModel> getPersonasPorNombre(String nombre, String apellidoPaterno, String apellidoMaterno) {
-        // Validamos que los tres datos vengan con información
-        if (nombre == null || nombre.isBlank() || apellidoPaterno == null || apellidoPaterno.isBlank() || apellidoMaterno == null || apellidoMaterno.isBlank()) {
-            return new ArrayList<>();
-        }
-        
         try {
-            Query query = firestore.collection(COLLECTION)
-                    .whereEqualTo("nombre", nombre)
-                    .whereEqualTo("apellidoPaterno", apellidoPaterno)
-                    .whereEqualTo("apellidoMaterno", apellidoMaterno);
+            Query query = firestore.collection(COLLECTION);
+
+            if (nombre != null && !nombre.isBlank()) {
+                query = query.whereEqualTo("nombre", nombre);
+            }
+            if (apellidoPaterno != null && !apellidoPaterno.isBlank()) {
+                query = query.whereEqualTo("apellidoPaterno", apellidoPaterno);
+            }
+            if (apellidoMaterno != null && !apellidoMaterno.isBlank()) {
+                query = query.whereEqualTo("apellidoMaterno", apellidoMaterno);
+            }
                     
             ApiFuture<QuerySnapshot> future = query.get();
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
             List<PersonaModel> personasEncontradas = new ArrayList<>();
 
-            // AQUÍ ESTÁ EL CAMBIO CLAVE
             for (DocumentSnapshot document : documents) {
-                // Eliminamos toObject() y el if. Extraemos directo del document.
                 personasEncontradas.add(new PersonaModel(
                         document.getId(),
                         document.getString("nombre"),
@@ -398,23 +406,21 @@ public class PersonaRepository {
                 ));
             }
             
-            if (personasEncontradas.isEmpty()) {
-                System.out.println("No se encontró ninguna persona con el nombre: " + nombre + " " + apellidoPaterno + " " + apellidoMaterno);
-            }
             return personasEncontradas;
             
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException("No fue posible obtener a las personas por el nombre: " + nombre
-                    + " por el error: " + e.getMessage());
+            throw new RuntimeException("Error al consultar personas: " + e.getMessage());
         }
     }
 
     public PersonaModel guardar(PersonaModel persona) {
         try {
             // 1. Calculamos los datos usando los métodos que ya tienes en el Repositorio
+            Double pesoRedondeado = redondear(persona.peso());
+            Double estaturaRedondeada = redondear(persona.estatura());
             String curpCalculado = generarCurp(persona);
             String rfcCalculado = generarRfc(persona);
-            Double imcCalculado = calcularIMC(persona.peso(), persona.estatura());
+            Double imcCalculado = calcularIMC(pesoRedondeado, estaturaRedondeada);
 
             DocumentReference documentReference = firestore.collection(COLLECTION).document();
             
@@ -426,8 +432,8 @@ public class PersonaRepository {
             datos.put("fechaDeNacimiento", persona.fechaDeNacimiento());
             datos.put("genero", persona.genero());
             datos.put("estatusMigratorio", persona.estatusMigratorio());
-            datos.put("estatura", persona.estatura());
-            datos.put("peso", persona.peso());
+            datos.put("estatura", estaturaRedondeada);
+            datos.put("peso", pesoRedondeado);
             datos.put("telefono", persona.telefono());
             datos.put("email", persona.email());
             // Agregamos los calculados
@@ -447,8 +453,8 @@ public class PersonaRepository {
                     persona.fechaDeNacimiento(),
                     persona.genero(),
                     persona.estatusMigratorio(),
-                    persona.estatura(),
-                    persona.peso(),
+                    estaturaRedondeada,
+                    pesoRedondeado,
                     persona.telefono(),
                     persona.email(),
                     curpCalculado,

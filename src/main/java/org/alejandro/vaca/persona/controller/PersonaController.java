@@ -5,6 +5,9 @@ import org.alejandro.vaca.persona.model.PersonaModel;
 import org.alejandro.vaca.persona.repository.PersonaRepository;
 import java.util.List;
 
+     import org.springframework.web.bind.annotation.CrossOrigin;
+     import org.springframework.web.bind.annotation.RequestParam;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,10 +16,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-@RequestMapping("personamanager/personas")
-public class PersonaController{
+    
+    @RestController
+    @RequestMapping("personas/personas-api")
+    public class PersonaController {
     private final PersonaService personaService;
     private final PersonaRepository personaRepository;
     public PersonaController(PersonaService personaService, PersonaRepository personaRepository) {
@@ -25,9 +28,13 @@ public class PersonaController{
     }
     // Todos los metodos GET
     @GetMapping
-    public List<PersonaModel> getPersonasPorNombre(@PathVariable String nombre, String apellidoP, String apellidoM) {
-        return personaService.getPersonasPorNombre(nombre, apellidoP, apellidoM);
-    }
+        public List<PersonaModel> getPersonasPorNombre(
+            @RequestParam(required = false) String nombre, 
+            @RequestParam(required = false) String apellidoP, 
+            @RequestParam(required = false) String apellidoM
+        ) {
+            return personaService.getPersonasPorNombre(nombre, apellidoP, apellidoM);
+        }
     @GetMapping("/id/{id}")
     public PersonaModel obtenerLibroPorId(@PathVariable String id) {
         return personaService.buscarPersonaPorId(id);

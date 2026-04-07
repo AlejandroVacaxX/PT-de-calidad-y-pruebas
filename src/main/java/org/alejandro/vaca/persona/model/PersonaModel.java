@@ -27,10 +27,10 @@ public record PersonaModel(
 
 ) {
     public PersonaModel {
-        nombre = nombre == null ? null : nombre.trim();
+        nombre = nombre == null ? null : nombre.trim().toLowerCase();
         apellidoPaterno = apellidoPaterno == null ? null : apellidoPaterno.trim();
         apellidoMaterno = apellidoMaterno == null ? null : apellidoMaterno.trim();
-        genero = genero == null ? null : genero.trim();
+        genero = genero == null ? null : genero.trim().toLowerCase();
         estatusMigratorio = estatusMigratorio == null ? null : estatusMigratorio.trim().toLowerCase();
         telefono = telefono == null ? null : telefono.trim().toLowerCase();
         email = email == null ? null : email.trim();

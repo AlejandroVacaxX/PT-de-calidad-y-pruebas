@@ -4,7 +4,8 @@ export default function Registro() {
 
   const [form, setForm] = useState({
     nombre: "",
-    apellidos: "",
+    apellidoPaterno: "",
+    apellidoMaterno: "",
     fechaDeNacimiento: "",
     genero: "",
     estatusMigratorio: "",
@@ -23,15 +24,47 @@ export default function Registro() {
     });
   };
 
+  const formatearFecha = (fecha) => {
+    if (!fecha) return "";
+    const [year, month, day] = fecha.split("-");
+    return `${day}/${month}/${year}`;
+  };
+
   const guardarPersona = async () => {
     try {
-      const persona = {
-        ...form,
-        estatura: parseFloat(form.estatura),
-        peso: parseFloat(form.peso)
+      // Mapeo de valores del formulario a los valores esperados por el backend (regex)
+      const mapeoGenero = {
+        "Masculino": "masculino",
+        "Femenino": "femenino",
+        "No binario": "nobinario"
       };
 
-      const response = await fetch("http://localhost:8080/personamanager/personas", {
+      const mapeoEstatus = {
+        "Mexicano": "mexicano",
+        "Ciudadano": "ciudadano",
+        "Nacionalizado": "nacionalizado",
+        "Residente Temporal": "residentetemporal",
+        "Residente Permanente": "residentepermanente"
+      };
+
+      const persona = {
+        ...form,
+        genero: mapeoGenero[form.genero] || form.genero.toLowerCase(),
+        estatusMigratorio: mapeoEstatus[form.estatusMigratorio] || form.estatusMigratorio.toLowerCase().replace(/\s+/g, ''),
+        fechaDeNacimiento: formatearFecha(form.fechaDeNacimiento),
+        estatura: parseFloat(form.estatura) / 100, // Convertir cm a metros
+        peso: parseFloat(form.peso),
+        // Aseguramos que el telefono solo tenga numeros para el regex ^(55\d{8})$
+        telefono: form.telefono.replace(/\D/g, '')
+      };
+
+      // Validacion previa del telefono antes de enviar
+      if (!/^55\d{8}$/.test(persona.telefono)) {
+        setMensaje("❌ El teléfono debe tener 10 dígitos y empezar con 55");
+        return;
+      }
+
+      const response = await fetch("http://localhost:8080/personas/personas-api", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -48,9 +81,11 @@ export default function Registro() {
       // Reset formulario
       setForm({
         nombre: "",
-        apellidos: "",
+        apellidoPaterno: "",
+        apellidoMaterno: "",
         fechaDeNacimiento: "",
         genero: "",
+        estatusMigratorio: "",
         email: "",
         telefono: "",
         estatura: "",
@@ -81,9 +116,11 @@ export default function Registro() {
           <button
             onClick={() => setForm({
               nombre: "",
-              apellidos: "",
+              apellidoPaterno: "",
+              apellidoMaterno: "",
               fechaDeNacimiento: "",
               genero: "",
+              estatusMigratorio: "",
               email: "",
               telefono: "",
               estatura: "",
@@ -132,15 +169,27 @@ export default function Registro() {
               />
             </div>
 
-            <div>
-              <label className="text-sm text-gray-500">Apellidos</label>
-              <input
-                className="input"
-                type="text"
-                name="apellidos"
-                value={form.apellidos}
-                onChange={handleChange}
-              />
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-sm text-gray-500">Apellido Paterno</label>
+                <input
+                  className="input"
+                  type="text"
+                  name="apellidoPaterno"
+                  value={form.apellidoPaterno}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-500">Apellido Materno</label>
+                <input
+                  className="input"
+                  type="text"
+                  name="apellidoMaterno"
+                  value={form.apellidoMaterno}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
             <div>

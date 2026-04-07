@@ -23,17 +23,13 @@ public class Persona{
         System.out.println("Aplicacion Persona Inicializada Correctamente");
         System.out.println("Endpoint Disponible En:");
         System.out.println("http://localhost:8080/personas/personas-api");
-        System.out.println("El sistema se apagara en 10 segundos");
-        Thread.sleep(10000);
-        System.out.println("Cerrando El Servicio");
-        System.exit(0);
+      
     }
     @Bean
     //@Profile("!test")
     //@ConditionalOnProperty(name = "app.cargar-datos", havingValue = "true", matchIfMissing = true)
     CommandLineRunner init(PersonaService personaService, Validator validator) {
         return args -> {
-            System.out.println("Aplicacion Persona Inicializada Correctamente");
             Scanner scanner = new Scanner(System.in);
             PersonaModel personaValida = null;
             /* 
@@ -85,7 +81,7 @@ public class Persona{
             } catch (Exception e) {
                 System.out.println("No Se Pudo Registrar La Persona Por El Error " + e + ". Vuelva A Intentarlo");
             } 
-             */   try {
+                try {
                    
                     String nombre = "Alejandro".toLowerCase();
                     String apellidoP = "Pintor".toLowerCase();
@@ -166,6 +162,7 @@ public class Persona{
     } catch(Exception e) {
         System.out.println("Error al actualizar por CURP: " + e.getMessage());
     }
+        */
         };
     }
 }
