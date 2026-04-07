@@ -280,37 +280,33 @@ public class PersonaRepository {
     }
 
     // MetodoGenericoDelete
-    private boolean deletePersonaGenerico(String identificador, PersonaModel personaDelete, String tipoBusqueda) {
+    private boolean deletePersonaGenerico(String identificador, String tipoBusqueda) {
 
-        if (identificador == null || identificador.isBlank() || personaDelete == null) {
+        if (identificador == null || identificador.isBlank()) {
             throw new IllegalArgumentException(
-                    "El " + tipoBusqueda + " y los datos no pueden ser nulos");
+                    "El " + tipoBusqueda + " no puede ser nulo");
         }
         try {
             DocumentReference documentReference = firestore.collection(COLLECTION).document(identificador);
             ApiFuture<WriteResult> future = documentReference.delete();
             future.get();
-            System.out.println("Los datos de la persona Fueron eliminados exitosamente");
+            System.out.println("Los datos de la persona con el " + tipoBusqueda + ": " + identificador + " fueron eliminados exitosamente");
             return true;
 
         } catch (InterruptedException | ExecutionException e) {
-            System.err.println("Error al intentar borrar los datos");
+            System.err.println("Error al intentar borrar los datos con " + tipoBusqueda + ": " + identificador);
             return false;
-
         }
     }
 
-    public void deletePersonaPorRFC(String rfc, PersonaModel personaActualizada) {
-        deletePersonaGenerico(rfc, personaActualizada, "RFC");
+    public void deletePersonaPorRFC(String rfc) {
+        deletePersonaGenerico(rfc, "RFC");
     }
 
-    public void deletePersonaPorCurp(String rfc, PersonaModel personaActualizada) {
-        deletePersonaGenerico(rfc, personaActualizada, "CURP");
+    public void deletePersonaPorCurp(String curp) {
+        deletePersonaGenerico(curp, "CURP");
     }
 
-    public void deletePersonaPorId(String rfc, PersonaModel personaActualizada) {
-        deletePersonaGenerico(rfc, personaActualizada, "Id");
-    }
 
     // Metodo Generico para Update
     private PersonaModel ejecutarActualizacionBase(String identificador, PersonaModel personaActualizada,
@@ -410,6 +406,7 @@ public class PersonaRepository {
         try {
             CollectionReference collectionReference = firestore.collection(COLLECTION);
             DocumentReference documentReference = firestore.collection(COLLECTION).document();
+            @SuppressWarnings("null")
             ApiFuture<WriteResult> future = documentReference.set(Map.of(
                     "nombre", persona.nombre(),
                     "apellidoPaterno", persona.apellidoPaterno(),
@@ -425,16 +422,16 @@ public class PersonaRepository {
             future.get();
             return new PersonaModel(
                     documentReference.getId(),
-                    personaModel.nombre(),
-                    personaModel.apellidoPaterno(),
-                    personaModel.apellidoMaterno(),
-                    personaModel.fechaDeNacimiento(),
-                    personaModel.genero(),
-                    personaModel.estatusMigratorio(),
-                    personaModel.estatura(),
-                    personaModel.peso(),
-                    personaModel.telefono(),
-                    personaModel.email());
+                    persona.nombre(),
+                    persona.apellidoPaterno(),
+                    persona.apellidoMaterno(),
+                    persona.fechaDeNacimiento(),
+                    persona.genero(),
+                    persona.estatusMigratorio(),
+                    persona.estatura(),
+                    persona.peso(),
+                    persona.telefono(),
+                    persona.email());
         } catch (Exception e) {
             throw new RuntimeException("No fue posible guardar la persona por el error: " + e);
         }

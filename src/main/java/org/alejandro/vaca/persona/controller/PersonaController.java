@@ -1,14 +1,32 @@
+package org.alejandro.vaca.persona.controller;
+
+import org.alejandro.vaca.persona.service.PersonaService;
+import org.alejandro.vaca.persona.model.PersonaModel;
+import org.alejandro.vaca.persona.repository.PersonaRepository;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 @RequestMapping("/personas/personas-api")
 public class PersonaController{
     private final PersonaService personaService;
-    public PersonaController(PersonaService personaService) {
+    private final PersonaRepository personaRepository;
+    public PersonaController(PersonaService personaService, PersonaRepository personaRepository) {
+        this.personaRepository = personaRepository;
         this.personaService = personaService;
     }
     // Todos los metodos GET
     @GetMapping
-    public List<PersonaModel> listarPersonas() {
-        return personaService.listarPersonas();
+    public List<PersonaModel> getPersonasPorNombre(@PathVariable String nombre) {
+        return personaService.getPersonasPorNombre(nombre);
     }
     @GetMapping("/id/{id}")
     public PersonaModel obtenerLibroPorId(@PathVariable String id) {
@@ -16,11 +34,11 @@ public class PersonaController{
     }
     @GetMapping("/curp/{curp}")
     public PersonaModel obtenerPersonaPorCurp(@PathVariable String curp) {
-        return personaService.buscarPersonaPorCurp(curp);
+        return personaRepository.getPersonaPorCurp(curp).orElseThrow(() -> new IllegalArgumentException("El curp" + curp + " No Existe"));
     }
     @GetMapping("/rfc/{rfc}")
     public PersonaModel obtenerPersonaPorRfc(@PathVariable String rfc) {
-        return personaService.buscarPersonaPorRfc(rfc);
+        return personaRepository.getPersonaPorRFC(rfc).orElseThrow(() -> new IllegalArgumentException("El rfc" + rfc + " No Existe"));
     }
     // El unico metodo POST
     @PostMapping
@@ -30,7 +48,7 @@ public class PersonaController{
     // Todos los metodos PUT para actualizar los datos de la persona
     @PutMapping("/id/{id}")
     public PersonaModel actualizarPersona(@PathVariable String id, @RequestBody PersonaModel persona) {
-        return personaService.actualizarPersona(persona);
+        return personaService.actualizarPersonaPorId(id, persona);
     }
     @PutMapping("/curp/{curp}")
     public PersonaModel actualizarPersonaPorCurp(@PathVariable String curp, @RequestBody PersonaModel persona) {
@@ -46,11 +64,11 @@ public class PersonaController{
         return personaService.eliminarPersona(id);
     }
     @DeleteMapping("/curp/{curp}")
-    public boolean eliminarPersonaPorCurp(@PathVariable String curp) {
-        return personaService.eliminarPersonaPorCurp(curp);
+    public void eliminarPersonaPorCurp(@PathVariable String curp) {
+        personaRepository.deletePersonaPorCurp(curp);
     }
     @DeleteMapping("/rfc/{rfc}")
-    public boolean eliminarPersonaPorRfc(@PathVariable String rfc) {
-        return personaService.eliminarPersonaPorRfc(rfc);
+    public void eliminarPersonaPorRfc(@PathVariable String rfc) {
+        personaRepository.deletePersonaPorRFC(rfc);
     }
 }
