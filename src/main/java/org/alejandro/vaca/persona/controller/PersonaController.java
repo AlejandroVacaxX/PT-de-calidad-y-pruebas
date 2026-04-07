@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/personas/personas-api")
+@RequestMapping("personamanager/personas")
 public class PersonaController{
     private final PersonaService personaService;
     private final PersonaRepository personaRepository;

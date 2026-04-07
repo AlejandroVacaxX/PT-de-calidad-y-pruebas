@@ -14,8 +14,8 @@ public class PersonaService {
         this.personaRepository = personaRepository;
     }
 
-    public List<PersonaModel> getPersonasPorNombre(String nombre) {
-        return personaRepository.getPersonasPorNombre(nombre);
+    public List<PersonaModel> getPersonasPorNombre(String nombre,String apellidoP,String apellidoM) {
+        return personaRepository.getPersonasPorNombre(nombre,apellidoP,apellidoM);
     }
 
     public PersonaModel buscarPersonaPorId(String id) {

@@ -362,43 +362,50 @@ public class PersonaRepository {
         return ejecutarActualizacionBase(rfc, personaActualizada, "RFC");
     }
 
-    public List<PersonaModel> getPersonasPorNombre(String nombre) {
-        if (nombre == null || nombre.isBlank()) {
+
+    public List<PersonaModel> getPersonasPorNombre(String nombre, String apellidoPaterno, String apellidoMaterno) {
+        // Validamos que los tres datos vengan con información
+        if (nombre == null || nombre.isBlank() || apellidoPaterno == null || apellidoPaterno.isBlank() || apellidoMaterno == null || apellidoMaterno.isBlank()) {
             return new ArrayList<>();
         }
+        
         try {
-            Query query = firestore.collection(COLLECTION).whereEqualTo("nombre", nombre);
+            Query query = firestore.collection(COLLECTION)
+                    .whereEqualTo("nombre", nombre)
+                    .whereEqualTo("apellidoPaterno", apellidoPaterno)
+                    .whereEqualTo("apellidoMaterno", apellidoMaterno);
+                    
             ApiFuture<QuerySnapshot> future = query.get();
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
             List<PersonaModel> personasEncontradas = new ArrayList<>();
 
+            // AQUÍ ESTÁ EL CAMBIO CLAVE
             for (DocumentSnapshot document : documents) {
-                PersonaModel persona = document.toObject(PersonaModel.class);
-
-                if (persona != null) {
-                    personasEncontradas.add(new PersonaModel(
-                            document.getId(),
-                            persona.nombre(),
-                            persona.apellidoPaterno(),
-                            persona.apellidoMaterno(),
-                            persona.fechaDeNacimiento(),
-                            persona.genero(),
-                            persona.estatusMigratorio(),
-                            persona.estatura(),
-                            persona.peso(),
-                            persona.telefono(),
-                            persona.email()));
-                }
+                // Eliminamos toObject() y el if. Extraemos directo del document.
+                personasEncontradas.add(new PersonaModel(
+                        document.getId(),
+                        document.getString("nombre"),
+                        document.getString("apellidoPaterno"),
+                        document.getString("apellidoMaterno"),
+                        document.getString("fechaDeNacimiento"),
+                        document.getString("genero"),
+                        document.getString("estatusMigratorio"),
+                        document.getDouble("estatura"),
+                        document.getDouble("peso"),
+                        document.getString("telefono"),
+                        document.getString("email")
+                ));
             }
+            
             if (personasEncontradas.isEmpty()) {
-                System.out.println("No se encontró ninguna persona con el nombre: " + nombre);
+                System.out.println("No se encontró ninguna persona con el nombre: " + nombre + " " + apellidoPaterno + " " + apellidoMaterno);
             }
             return personasEncontradas;
+            
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException("No fue posible obtener a las personas por el nombre: " + nombre
                     + " por el error: " + e.getMessage());
-
         }
     }
 

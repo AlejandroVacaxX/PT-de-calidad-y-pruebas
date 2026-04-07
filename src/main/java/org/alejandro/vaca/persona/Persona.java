@@ -36,6 +36,7 @@ public class Persona{
             System.out.println("Aplicacion Persona Inicializada Correctamente");
             Scanner scanner = new Scanner(System.in);
             PersonaModel personaValida = null;
+            /*
             while (personaValida == null) {
                 try {
                     System.out.println("Ingresa El Nombre De La Persona:");
@@ -75,13 +76,28 @@ public class Persona{
                 } catch (Exception e) {
                     System.out.println("No Se pudo regitrar a la persona por el error" + e + ". Vuelva A Intentarlo");
                 }
-            }
+            } 
             try{
                 personaService.registrarPersona(personaValida);
                 System.out.println("Persona Registrada Correctamente");
             } catch (Exception e) {
                 System.out.println("No Se Pudo Registrar La Persona Por El Error " + e + ". Vuelva A Intentarlo");
-            }
+            } */
+                try {
+                   
+                    String nombre = "Alejandro".toLowerCase();
+                    String apellidoP = "Pintor".toLowerCase();
+                    String apellidoM = "Vaca".toLowerCase();
+                  
+                    System.out.println("Buscando a: " + nombre + " " + apellidoP + " " + apellidoM + "...");
+                    
+                   
+                    personaService.getPersonasPorNombre(nombre, apellidoP, apellidoM)
+                                  .forEach(System.out::println);
+    
+                } catch(Exception e) {
+                    System.out.println("Ocurrió un error en la consulta: " + e.getMessage());
+                }
            
         };
     }
