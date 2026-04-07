@@ -57,7 +57,7 @@ export default function InfoPersona() {
     return (
       <div className="p-8">
         <p className="text-red-500 font-bold">⚠️ Error: No se pudo cargar la información.</p>
-        <button onClick={() => handleNavigation("/")} className="mt-4 text-blue-600 underline">
+        <button onClick={() => handleNavigation("/listado")} className="mt-4 text-blue-600 underline">
           Regresar al listado
         </button>
       </div>

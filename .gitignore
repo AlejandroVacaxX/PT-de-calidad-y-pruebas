@@ -1,0 +1,8 @@
+node_modules/
+**/node_modules/
+
+# Firebase/service account keys
+serviceAccountKey*.json
+servicesAccountKey*.json
+**/serviceAccountKey*.json
+**/servicesAccountKey*.json

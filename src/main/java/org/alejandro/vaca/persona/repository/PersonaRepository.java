@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import org.alejandro.vaca.persona.Persona;
 import org.alejandro.vaca.persona.model.PersonaModel;
 import org.springframework.stereotype.Repository;
 
@@ -41,6 +42,43 @@ public class PersonaRepository {
      * aleatorios en
      * los dígitos 18 y 19 para completar la estructura.
      */
+
+    public List<PersonaModel> obtenerTodos(){
+
+        try {
+            ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION).get();
+            QuerySnapshot querySnapshot = future.get();
+            List<PersonaModel> personas = new ArrayList<>();
+
+            for (DocumentSnapshot document : querySnapshot.getDocuments()){
+                PersonaModel persona = document.toObject(PersonaModel.class);
+                if (persona != null){
+                    personas.add(new PersonaModel(
+                            document.getId(),
+                            persona.nombre(),
+                            persona.apellidoPaterno(),
+                            persona.apellidoMaterno(),
+                            persona.fechaDeNacimiento(),
+                            persona.genero(),
+                            persona.estatusMigratorio(),
+                            persona.estatura(),
+                            persona.peso(),
+                            persona.telefono(),
+                            persona.email(),
+                            persona.rfc(),
+                            persona.curp(),
+                            persona.imc()
+                    ));
+                }else{
+                    System.out.println("No se encontró ninguna persona");
+                }
+            }
+            return personas;
+        }catch (Exception e){
+            throw new RuntimeException("No fue posible obtener las personas por el error" + e);
+        }
+    }
+
 
     // Inician metodos de IMC
     public Double calcularIMC(Double peso, Double estatura) {
