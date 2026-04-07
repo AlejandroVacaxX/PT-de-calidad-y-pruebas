@@ -36,7 +36,7 @@ public class Persona{
             System.out.println("Aplicacion Persona Inicializada Correctamente");
             Scanner scanner = new Scanner(System.in);
             PersonaModel personaValida = null;
-            
+            /* 
             while (personaValida == null) {
                 try {
                     System.out.println("Ingresa El Nombre De La Persona:");
@@ -78,13 +78,14 @@ public class Persona{
                     System.out.println("No Se pudo regitrar a la persona por el error" + e + ". Vuelva A Intentarlo");
                 }
             } 
+                
             try{
                 personaService.registrarPersona(personaValida);
                 System.out.println("Persona Registrada Correctamente");
             } catch (Exception e) {
                 System.out.println("No Se Pudo Registrar La Persona Por El Error " + e + ". Vuelva A Intentarlo");
             } 
-                try {
+             */   try {
                    
                     String nombre = "Alejandro".toLowerCase();
                     String apellidoP = "Pintor".toLowerCase();
@@ -99,104 +100,72 @@ public class Persona{
                 } catch(Exception e) {
                     System.out.println("Ocurrió un error en la consulta: " + e.getMessage());
                 }
-            try{
-            System.out.println("==========================================");
-            System.out.println("🚀 INICIANDO BATERÍA DE PRUEBAS CRUD");
-            System.out.println("==========================================\n");
-            String idGenerado = "142DvK7R1q6DKMvDTIAk";
-            
-
-            // ---------------------------------------------------------
-            // 1. PRUEBA DE REGISTRO
-            // ---------------------------------------------------------
-            System.out.println("--- 1. PROBANDO REGISTRO ---");
-            try {
-                PersonaModel personaNueva = new PersonaModel(
-                        null, "Sujeto", "De", "Pruebas", "01/01/2000", "No Binario", 
-                        "Mexicano", 1.75, 70.0, "5511223344", "prueba@test.com","piva000101","piva000101",19.0
-                );
-                PersonaModel registrada = personaService.registrarPersona(personaNueva);
-                String idGeneradoviejo = registrada.id(); // Guardamos el ID para usarlo después
-
-                System.out.println("✅ Registro exitoso. ID generado: " + idGenerado);
-            } catch (Exception e) {
-                System.out.println("❌ Error al registrar: " + e.getMessage());
-            }
-
-            // ---------------------------------------------------------
-            // 2. PRUEBAS DE BÚSQUEDA
-            // ---------------------------------------------------------
-            System.out.println("\n--- 2. PROBANDO BÚSQUEDAS ---");
-            try {
-                System.out.println("Buscando por ID: " + idGenerado);
-                PersonaModel encontradaPorId = personaService.buscarPersonaPorId(idGenerado);
-                System.out.println("✅ Persona encontrada exitosamente.");
-            } catch (Exception e) {
-                System.out.println("❌ Error en búsqueda por ID: " + e.getMessage());
-            }
-
-            try {
-                System.out.println("Buscando por RFC (Document ID)...");
-                // Nota: Esto fallará si no tienes un documento cuyo ID sea exactamente "RFC_PRUEBA"
-                PersonaModel encontradaPorRfc = personaService.buscarPersonaPorRfc("RFC_PRUEBA");
-                System.out.println("✅ Encontrada por RFC.");
-            } catch (Exception e) {
-                System.out.println("⚠️ Búsqueda por RFC arrojó: " + e.getMessage());
-            }
-
-            // ---------------------------------------------------------
-            // 3. PRUEBAS DE ACTUALIZACIÓN
-            // ---------------------------------------------------------
-            System.out.println("\n--- 3. PROBANDO ACTUALIZACIONES ---");
-            try {
-                System.out.println("Actualizando datos de la persona con ID: " + idGenerado);
-                PersonaModel datosNuevos = new PersonaModel(
-                        idGenerado, "alejandro", "pintor", "vaca", "01/01/2000", "Masculino", 
-                        "Mexicano", 1.80, 75.0, "5511223344", "editado@test.com","piva000101","piva000101",19.0
-                );
-                
-                PersonaModel actualizada = personaService.actualizarPersonaPorId(idGenerado, datosNuevos);
-                System.out.println("✅ Actualización por ID exitosa. Nuevo nombre: " + actualizada.apellidoMaterno());
-                
-                // Prueba del método abstracto que usa el ID interno
-                personaService.actualizarPersona(datosNuevos);
-                System.out.println("✅ Actualización general exitosa.");
-
-            } catch (Exception e) {
-                System.out.println("❌ Error al actualizar: " + e.getMessage());
-            }
-
-            // ---------------------------------------------------------
-            // 4. PRUEBAS DE ELIMINACIÓN
-            // ---------------------------------------------------------
-            System.out.println("\n--- 4. PROBANDO ELIMINACIONES ---");
-            try {
-                System.out.println("Eliminando persona por ID: " + idGenerado);
-                boolean eliminado = personaService.eliminarPersona(idGenerado);
-                System.out.println(eliminado ? "✅ Eliminación por ID exitosa." : "❌ No se pudo eliminar la persona.");
-            } catch (Exception e) {
-                System.out.println("❌ Error al eliminar por ID: " + e.getMessage());
-            }
-
-            try {
-                System.out.println("Eliminando por CURP (Document ID)...");
-                personaService.eliminarPersonaPorCurp("CURP_PRUEBA");
-                System.out.println("✅ Comando de eliminar por CURP enviado.");
-                
-                System.out.println("Eliminando por RFC (Document ID)...");
-                personaService.eliminarPersonaPorRfc("RFC_PRUEBA");
-                System.out.println("✅ Comando de eliminar por RFC enviado.");
-            } catch (Exception e) {
-                System.out.println("⚠️ Error en métodos de borrado por CURP/RFC: " + e.getMessage());
-            }
-
-            System.out.println("\n==========================================");
-            System.out.println("🏁 BATERÍA DE PRUEBAS FINALIZADA");
-            System.out.println("==========================================");
+          
+        // Para probar que se busca por ID
+        try {
+            System.out.println("Buscando por id");
+            PersonaModel si = personaService.buscarPersonaPorId("1cEmhxdubmxcsmWfBB3g");
+            System.out.println(si);
+        } catch (Exception e) {
+            System.out.println("Sepa la verga porque pero algo salio mal" + e);
         }
-        catch(Exception e){
-            System.out.println("Sepa la verga pero hubo error");
-        } 
+        // Para probar que se busque por RFC
+        try {
+            String rfc = "DEPS000101";
+            System.out.println("Buscando por RFC: " + rfc );
+            PersonaModel respuesta = personaService.buscarPersonaPorRfc(rfc);
+            System.out.println(respuesta);
+        } catch (Exception e) {
+            System.out.println("Algo salio mal " + e);
+        }
+        // para probar que se puede hacer busquedas de curp
+        try {
+            String curp = "PIVA991212MXXX00";
+            System.out.println("Buscando por CURP: " + curp );
+            PersonaModel encontrada = personaService.buscarPersonaPorCurp(curp);
+            System.out.println(encontrada);
+        } catch (Exception e) {
+            System.out.println("Algo salio mal " + e);
+        }
+      
+        PersonaModel datosNuevos = new PersonaModel(
+            null, "Alejandro Modificado", "Pintor", "Vaca", "12/12/2000", 
+            "Masculino", "Mexicano", 1.80, 75.0, "5555555555", "editado@gmail.com", 
+            null, null, null
+    );
+
+    
+    try {
+      
+        String id = "0elTfblgVzl8OGp4z2va"; 
+        System.out.println("Actualizando por ID...");
+        PersonaModel actualizacion = personaService.actualizarPersonaPorId(id, datosNuevos);
+        System.out.println(actualizacion);
+    } catch(Exception e) {
+        System.out.println("Error al actualizar por ID: " + e.getMessage());
+    }
+    
+     
+     try {
+       
+        String rfc = "DEPS000101"; 
+        System.out.println("Actualizando por RFC...");
+        PersonaModel actualizacion = personaService.actualizarPersonaPorRfc(rfc, datosNuevos);
+        System.out.println(actualizacion);
+    } catch(Exception e) {
+        System.out.println("Error al actualizar por RFC: " + e.getMessage());
+    }
+    
+
+    try {
+       
+        String curp = "DEPS000101NXXX00"; 
+        System.out.println("Actualizando por CURP...");
+        PersonaModel actualizacion = personaService.actualizarPersonaPorCurp(curp, datosNuevos);
+        System.out.println(actualizacion);
+    } catch(Exception e) {
+        System.out.println("Error al actualizar por CURP: " + e.getMessage());
+    }
         };
     }
 }

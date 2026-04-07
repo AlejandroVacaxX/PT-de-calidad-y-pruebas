@@ -26,21 +26,23 @@ public class PersonaService {
 
     public PersonaModel buscarPersonaPorId(String id) {
         return personaRepository.obtenerPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("El Id" + id + " No Existe"));
+                .orElseThrow(() -> new IllegalArgumentException("El Id " + id + " No Existe"));
     }
     
     public PersonaModel buscarPersonaPorRfc(String rfc) {
         return personaRepository.getPersonaPorRFC(rfc)
-                .orElseThrow(() -> new IllegalArgumentException("El rfc" + rfc + " No Existe"));
+                .orElseThrow(() -> new IllegalArgumentException("El RFC " + rfc + " No Existe"));
+    }
+    public PersonaModel buscarPersonaPorCurp(String curp){
+        return personaRepository.getPersonaPorCurp(curp)
+            .orElseThrow(() -> new IllegalArgumentException("El curp" + curp + "no existe"));
+        
     }
 
     public PersonaModel registrarPersona(PersonaModel persona) {
         return personaRepository.guardar(persona);
     }
 
-    public PersonaModel actualizarPersona(PersonaModel persona) {
-        return personaRepository.actualizarPersonaPorId(persona.id(), persona);
-    }
 
     public PersonaModel actualizarPersonaPorId(String id, PersonaModel persona) {
         return personaRepository.actualizarPersonaPorId(id, persona);

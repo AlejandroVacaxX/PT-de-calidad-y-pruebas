@@ -34,15 +34,6 @@ public class PersonaRepository {
         this.firestore = fire;
     }
 
-    /*
-     * Dentro de la lógica de negocios del programa, se calculará el IMC de la
-     * persona, su RFC sin homoclave y su CURP, en el caso de este último, podrás
-     * crear valores
-     * aleatorios en
-     * los dígitos 18 y 19 para completar la estructura.
-     */
-
-    // Inician metodos de IMC
     public Double calcularIMC(Double peso, Double estatura) {
 
         return peso * (estatura * estatura);
@@ -51,60 +42,39 @@ public class PersonaRepository {
     public Optional<PersonaModel> obtenerPorId(String id) {
         if (id == null || id.isBlank()) {
             return Optional.empty();
-
         }
         try {
             DocumentReference documentReference = firestore.collection(COLLECTION).document(id);
             ApiFuture<DocumentSnapshot> future = documentReference.get();
             DocumentSnapshot document = future.get();
+            
             if (document.exists()) {
-                PersonaModel persona = document.toObject(PersonaModel.class);
-
-                if (persona != null) {
-                    return Optional.of(new PersonaModel(
-                            document.getId(),
-                            persona.nombre(),
-                            persona.apellidoPaterno(),
-                            persona.apellidoMaterno(),
-                            persona.fechaDeNacimiento(),
-                            persona.genero(),
-                            persona.estatusMigratorio(),
-                            persona.estatura(),
-                            persona.peso(),
-                            persona.telefono(),
-                            persona.email(),
-                            document.getString("curp"),
-                            document.getString("rfc"),
-                            document.getDouble("imc")
-
-                    ));
-
-                } else {
-                    System.out.println("No se encontro la persona con el id: " + id + " .");
-                }
+                return Optional.of(new PersonaModel(
+                        document.getId(),
+                        document.getString("nombre"),
+                        document.getString("apellidoPaterno"),
+                        document.getString("apellidoMaterno"),
+                        document.getString("fechaDeNacimiento"),
+                        document.getString("genero"),
+                        document.getString("estatusMigratorio"),
+                        document.getDouble("estatura"),
+                        document.getDouble("peso"),
+                        document.getString("telefono"),
+                        document.getString("email"),
+                        document.getString("curp"),
+                        document.getString("rfc"),
+                        document.getDouble("imc")
+                ));
+            } else {
+                System.out.println("No se encontro la persona con el id: " + id + " .");
+                return Optional.empty();
             }
-            return Optional.empty();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException("No fue posible obtener a la persona por el error: " + e);
         }
 
     }
-
-    public void getRfcPorId() {
-
-    }
-
-    public void getRfcPorCurp(String curp) {
-
-    }
-
-    public void updateRfcPorCurp() {
-
-    }
-
-    public void updateRfcPorNombreYFechaNac(String nombreCompleto, String fechaNac) {
-
-    }
+    
 
     public boolean esMayorDe16Anios(String fechaDeNacimiento) {
         try {
@@ -202,38 +172,37 @@ public class PersonaRepository {
             return Optional.empty();
         }
         try {
-            DocumentReference documentReference = firestore.collection(COLLECTION).document(curp);
-            ApiFuture<DocumentSnapshot> future = documentReference.get();
-            DocumentSnapshot document = future.get();
-            if (document.exists()) {
-                PersonaModel persona = document.toObject(PersonaModel.class);
-                if (persona != null) {
-                    return Optional.of(new PersonaModel(
-                            document.getId(),
-                            persona.nombre(),
-                            persona.apellidoPaterno(),
-                            persona.apellidoMaterno(),
-                            persona.fechaDeNacimiento(),
-                            persona.genero(),
-                            persona.estatusMigratorio(),
-                            persona.estatura(),
-                            persona.peso(),
-                            persona.telefono(),
-                            persona.email(),
-                            persona.curp(),
-                            persona.rfc(),
-                            persona.imc()
-                            ));
+            Query query = firestore.collection(COLLECTION).whereEqualTo("curp", curp);
+            ApiFuture<QuerySnapshot> future = query.get();
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
-                } else {
-                    System.out.println("No se encontro persona con el curp: " + curp);
-                }
-
+           
+            if (!documents.isEmpty()) {
+                DocumentSnapshot document = documents.get(0);
+                
+                return Optional.of(new PersonaModel(
+                        document.getId(),
+                        document.getString("nombre"),
+                        document.getString("apellidoPaterno"),
+                        document.getString("apellidoMaterno"),
+                        document.getString("fechaDeNacimiento"),
+                        document.getString("genero"),
+                        document.getString("estatusMigratorio"),
+                        document.getDouble("estatura"),
+                        document.getDouble("peso"),
+                        document.getString("telefono"),
+                        document.getString("email"),
+                        document.getString("curp"),
+                        document.getString("rfc"),
+                        document.getDouble("imc")
+                ));
+            } else {
+                System.out.println("No se encontro la persona con el Curp: " + curp + ".");
+                return Optional.empty();
             }
-            return Optional.empty();
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException("No fue posible obtener a la persona con el curp: " + curp);
-        }
+                throw new RuntimeException("No fue posible obtener a la persona por el error: " + e);
+            }
 
     }
 
@@ -242,38 +211,38 @@ public class PersonaRepository {
             return Optional.empty();
         }
         try {
-            DocumentReference documentReference = firestore.collection(COLLECTION).document(rfc);
-            ApiFuture<DocumentSnapshot> future = documentReference.get();
-            DocumentSnapshot document = future.get();
-            if (document.exists()) {
-                PersonaModel persona = document.toObject(PersonaModel.class);
-                if (persona != null) {
-                    return Optional.of(new PersonaModel(
-                            document.getId(),
-                            persona.nombre(),
-                            persona.apellidoPaterno(),
-                            persona.apellidoMaterno(),
-                            persona.fechaDeNacimiento(),
-                            persona.genero(),
-                            persona.estatusMigratorio(),
-                            persona.estatura(),
-                            persona.peso(),
-                            persona.telefono(),
-                            persona.email(),
-                            persona.curp(),
-                            persona.rfc(),
-                            persona.imc()));
+           
+            Query query = firestore.collection(COLLECTION).whereEqualTo("rfc", rfc);
+            ApiFuture<QuerySnapshot> future = query.get();
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
-                } else {
-                    System.out.println("No se encontro persona con el rfc: " + rfc);
-                }
-
+           
+            if (!documents.isEmpty()) {
+                DocumentSnapshot document = documents.get(0);
+                
+                return Optional.of(new PersonaModel(
+                        document.getId(),
+                        document.getString("nombre"),
+                        document.getString("apellidoPaterno"),
+                        document.getString("apellidoMaterno"),
+                        document.getString("fechaDeNacimiento"),
+                        document.getString("genero"),
+                        document.getString("estatusMigratorio"),
+                        document.getDouble("estatura"),
+                        document.getDouble("peso"),
+                        document.getString("telefono"),
+                        document.getString("email"),
+                        document.getString("curp"),
+                        document.getString("rfc"),
+                        document.getDouble("imc")
+                ));
+            } else {
+                System.out.println("No se encontro la persona con el RFC: " + rfc + ".");
+                return Optional.empty();
             }
-            return Optional.empty();
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException("No fue posible obtener a la persona con el rfc: " + rfc);
+            throw new RuntimeException("No fue posible obtener a la persona por el error: " + e);
         }
-
     }
 
     public boolean deletePersonaPorId(String id) {
@@ -291,58 +260,47 @@ public class PersonaRepository {
 
     }
 
-    // MetodoGenericoDelete
-    private boolean deletePersonaGenerico(String identificador, String tipoBusqueda) {
-
-        if (identificador == null || identificador.isBlank()) {
-            throw new IllegalArgumentException(
-                    "El " + tipoBusqueda + " no puede ser nulo");
-        }
-        try {
-            DocumentReference documentReference = firestore.collection(COLLECTION).document(identificador);
-            ApiFuture<WriteResult> future = documentReference.delete();
-            future.get();
-            System.out.println("Los datos de la persona con el " + tipoBusqueda + ": " + identificador + " fueron eliminados exitosamente");
-            return true;
-
-        } catch (InterruptedException | ExecutionException e) {
-            System.err.println("Error al intentar borrar los datos con " + tipoBusqueda + ": " + identificador);
-            return false;
-        }
-    }
-
-    public void deletePersonaPorRFC(String rfc) {
-        deletePersonaGenerico(rfc, "RFC");
-    }
-
-    public void deletePersonaPorCurp(String curp) {
-        deletePersonaGenerico(curp, "CURP");
-    }
-
-
     // Metodo Generico para Update
-    private PersonaModel ejecutarActualizacionBase(String identificador, PersonaModel personaActualizada,
-            String tipoBusqueda) {
+    private PersonaModel ejecutarActualizacionBase(String identificador, PersonaModel personaActualizada, String tipoBusqueda) {
         if (identificador == null || identificador.isBlank() || personaActualizada == null) {
-            throw new IllegalArgumentException(
-                    "El " + tipoBusqueda + " y los datos de actualización no pueden ser nulos");
+            throw new IllegalArgumentException("El " + tipoBusqueda + " y los datos de actualización no pueden ser nulos");
         }
 
         try {
-
             DocumentReference documentReference = firestore.collection(COLLECTION).document(identificador);
-
             ApiFuture<DocumentSnapshot> futureSnapshot = documentReference.get();
             DocumentSnapshot document = futureSnapshot.get();
 
             if (!document.exists()) {
-                throw new RuntimeException(
-                        "No se puede actualizar. No existe registro con el " + tipoBusqueda + ": " + identificador);
+                throw new RuntimeException("No se puede actualizar. No existe registro con el " + tipoBusqueda + ": " + identificador);
             }
 
-            ApiFuture<WriteResult> futureWrite = documentReference.set(personaActualizada);
+         
+            String curpCalculado = generarCurp(personaActualizada);
+            String rfcCalculado = generarRfc(personaActualizada);
+            Double imcCalculado = calcularIMC(personaActualizada.peso(), personaActualizada.estatura());
+
+            
+            Map<String, Object> datos = new java.util.HashMap<>();
+            datos.put("nombre", personaActualizada.nombre());
+            datos.put("apellidoPaterno", personaActualizada.apellidoPaterno());
+            datos.put("apellidoMaterno", personaActualizada.apellidoMaterno());
+            datos.put("fechaDeNacimiento", personaActualizada.fechaDeNacimiento());
+            datos.put("genero", personaActualizada.genero());
+            datos.put("estatusMigratorio", personaActualizada.estatusMigratorio());
+            datos.put("estatura", personaActualizada.estatura());
+            datos.put("peso", personaActualizada.peso());
+            datos.put("telefono", personaActualizada.telefono());
+            datos.put("email", personaActualizada.email());
+            datos.put("curp", curpCalculado);
+            datos.put("rfc", rfcCalculado);
+            datos.put("imc", imcCalculado);
+
+        
+            ApiFuture<WriteResult> futureWrite = documentReference.set(datos);
             futureWrite.get();
 
+        
             return new PersonaModel(
                     identificador,
                     personaActualizada.nombre(),
@@ -355,27 +313,51 @@ public class PersonaRepository {
                     personaActualizada.peso(),
                     personaActualizada.telefono(),
                     personaActualizada.email(),
-                    document.getString("curp"),
-                    document.getString("rfc"),
-                    document.getDouble("imc"));
+                    curpCalculado,
+                    rfcCalculado,
+                    imcCalculado);
 
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(
-                    "Falló la actualización de la persona con " + tipoBusqueda + ": " + identificador, e);
+            throw new RuntimeException("Falló la actualización de la persona con " + tipoBusqueda + ": " + identificador, e);
         }
     }
+
+   
+
+
+
 
     public PersonaModel actualizarPersonaPorId(String id, PersonaModel personaActualizada) {
         return ejecutarActualizacionBase(id, personaActualizada, "ID");
     }
-
+    // --- ACTUALIZACIONES ---
     public PersonaModel actualizarPersonaPorCurp(String curp, PersonaModel personaActualizada) {
-        return ejecutarActualizacionBase(curp, personaActualizada, "CURP");
+        // 1. Buscamos a la persona con tu método que ya funciona
+        PersonaModel persona = getPersonaPorCurp(curp)
+                .orElseThrow(() -> new RuntimeException("No se encontró a nadie con el CURP: " + curp));
+        // 2. Usamos su ID real para la actualización base
+        return ejecutarActualizacionBase(persona.id(), personaActualizada, "CURP");
     }
 
     public PersonaModel actualizarPersonaPorRFC(String rfc, PersonaModel personaActualizada) {
-        return ejecutarActualizacionBase(rfc, personaActualizada, "RFC");
+        PersonaModel persona = getPersonaPorRFC(rfc)
+                .orElseThrow(() -> new RuntimeException("No se encontró a nadie con el RFC: " + rfc));
+        return ejecutarActualizacionBase(persona.id(), personaActualizada, "RFC");
     }
+
+    // --- ELIMINACIONES ---
+    public void deletePersonaPorRFC(String rfc) {
+        PersonaModel persona = getPersonaPorRFC(rfc)
+                .orElseThrow(() -> new RuntimeException("No se encontró a nadie con el RFC: " + rfc));
+        deletePersonaPorId(persona.id());
+    }
+
+    public void deletePersonaPorCurp(String curp) {
+        PersonaModel persona = getPersonaPorCurp(curp)
+                .orElseThrow(() -> new RuntimeException("No se encontró a nadie con el CURP: " + curp));
+        deletePersonaPorId(persona.id());
+    }
+    
 
 
     public List<PersonaModel> getPersonasPorNombre(String nombre, String apellidoPaterno, String apellidoMaterno) {

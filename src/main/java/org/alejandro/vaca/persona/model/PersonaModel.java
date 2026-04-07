@@ -21,8 +21,8 @@ public record PersonaModel(
         @Min(value = 0, message = "El peso no puede ser negativo") @Max(value = 280, message = "El peso no puede sobrepasar los 280kg") @Digits(integer = 3, fraction = 2, message = "El peso debe tener máximo 3 entero y 2 decimales") Double peso,
         @NotBlank(message = "El teléfono no puede esta vacio") @Pattern(regexp = "^(55\\d{8})$", message = "El teléfono debe tener 10 dígitos y comenzar con 55, No debe contener Letras ni caracteres especiales.") String telefono,
         @NotBlank(message = "El email no puede esta vacio") @Email(message = "El email debe tener un formato válido ejem: 'persona@gmail.com' ") String email,
-        String rfc,
         String curp,
+        String rfc,
         Double imc
 
 ) {

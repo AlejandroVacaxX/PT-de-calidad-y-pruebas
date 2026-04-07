@@ -25,8 +25,8 @@ public class PersonaController{
     }
     // Todos los metodos GET
     @GetMapping
-    public List<PersonaModel> getPersonasPorNombre(@PathVariable String nombre) {
-        return personaService.getPersonasPorNombre(nombre);
+    public List<PersonaModel> getPersonasPorNombre(@PathVariable String nombre, String apellidoP, String apellidoM) {
+        return personaService.getPersonasPorNombre(nombre, apellidoP, apellidoM);
     }
     @GetMapping("/id/{id}")
     public PersonaModel obtenerLibroPorId(@PathVariable String id) {
