@@ -2,7 +2,7 @@ package org.alejandro.vaca.persona;
 
 import java.util.Scanner;
 import java.util.Set;
-import java.util.Thread;
+
 
 import org.alejandro.vaca.persona.model.PersonaModel;
 import org.alejandro.vaca.persona.service.PersonaService;
