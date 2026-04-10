@@ -22,6 +22,7 @@ import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
+import com.google.firebase.internal.NonNull;
 
 @Repository
 public class PersonaRepository {
@@ -114,6 +115,7 @@ public class PersonaRepository {
     }
 
     private String generarRaizCurpRfc(PersonaModel persona) {
+        validarPersona(persona);
 
         String paterno = persona.apellidoPaterno().toUpperCase();
         String materno = persona.apellidoMaterno().toUpperCase();
@@ -130,15 +132,17 @@ public class PersonaRepository {
     }
 
     public String generarCurp(PersonaModel persona) {
-        if (persona.estatusMigratorio() == null || persona.estatusMigratorio().isBlank()) {
-            throw new IllegalArgumentException("El estatus migratorio no puede ser nulo o estar vacío");
-        }
-
+       
+        validarPersona(persona);
+        validarDatoPorNullYVacio(persona.estatusMigratorio());
+        validarDatoPorNullYVacio(persona.genero());
+    
+       
         String raiz = generarRaizCurpRfc(persona);
-        String inicialGenero = persona.genero() != null ? String.valueOf(persona.genero().charAt(0)).toUpperCase()
-                : "X";
-
-        return raiz + inicialGenero + "X" + "XX" + "00";
+        
+        String inicialGenero = String.valueOf(persona.genero().charAt(0)).toUpperCase();
+    
+        return raiz + inicialGenero + "C" + "CN" + "A4";
     }
 
     public String generarRfc(PersonaModel persona) {
@@ -174,9 +178,7 @@ public class PersonaRepository {
     }
 
     public Optional<PersonaModel> getPersonaPorCurp(String curp) {
-        if (curp == null || curp.isBlank()) {
-            return Optional.empty();
-        }
+        validarDatoPorNullYVacio(curp);
         try {
             Query query = firestore.collection(COLLECTION).whereEqualTo("curp", curp);
             ApiFuture<QuerySnapshot> future = query.get();
@@ -213,9 +215,7 @@ public class PersonaRepository {
     }
 
     public Optional<PersonaModel> getPersonaPorRFC(String rfc) {
-        if (rfc == null || rfc.isBlank()) {
-            return Optional.empty();
-        }
+        validarDatoPorNullYVacio(rfc);
         try {
            
             Query query = firestore.collection(COLLECTION).whereEqualTo("rfc", rfc);
@@ -267,11 +267,12 @@ public class PersonaRepository {
     }
 
     // Metodo Generico para Update
+    @NonNull
     private PersonaModel ejecutarActualizacionBase(String identificador, PersonaModel personaActualizada, String tipoBusqueda) {
-        if (identificador == null || identificador.isBlank() || personaActualizada == null) {
-            throw new IllegalArgumentException("El " + tipoBusqueda + " y los datos de actualización no pueden ser nulos");
-        }
-
+        validarDatoPorNullYVacio(tipoBusqueda);
+        validarDatoPorNullYVacio(tipoBusqueda);
+        validarPersona(personaActualizada);
+        
         try {
             DocumentReference documentReference = firestore.collection(COLLECTION).document(identificador);
             ApiFuture<DocumentSnapshot> futureSnapshot = documentReference.get();
@@ -334,11 +335,17 @@ public class PersonaRepository {
 
 
     public PersonaModel actualizarPersonaPorId(String id, PersonaModel personaActualizada) {
+        validarDatoPorNullYVacio(id);
+        validarPersona(personaActualizada);
+
         System.out.println("Los datos de la persona con el ID: " + id + "Fueron actualizados exitosamente");
         return ejecutarActualizacionBase(id, personaActualizada, "ID");
     }
 
     public PersonaModel actualizarPersonaPorCurp(String curp, PersonaModel personaActualizada) {
+        validarDatoPorNullYVacio(curp);
+        validarPersona(personaActualizada);
+
 
         PersonaModel persona = getPersonaPorCurp(curp)
                 .orElseThrow(() -> new RuntimeException("No se encontró a nadie con el CURP: " + curp));
@@ -347,6 +354,9 @@ public class PersonaRepository {
     }
 
     public PersonaModel actualizarPersonaPorRFC(String rfc, PersonaModel personaActualizada) {
+        validarDatoPorNullYVacio(rfc);
+        validarPersona(personaActualizada);
+        
         PersonaModel persona = getPersonaPorRFC(rfc)
                 .orElseThrow(() -> new RuntimeException("No se encontró a nadie con el RFC: " + rfc));
                 System.out.println("Los datos de la persona con el RFC: " + rfc + "Fueron actualizados exitosamente");
@@ -355,12 +365,16 @@ public class PersonaRepository {
 
     
     public void deletePersonaPorRFC(String rfc) {
+        validarDatoPorNullYVacio(rfc);
+
         PersonaModel persona = getPersonaPorRFC(rfc)
                 .orElseThrow(() -> new RuntimeException("No se encontró a nadie con el RFC: " + rfc));
         deletePersonaPorId(persona.id());
     }
 
     public void deletePersonaPorCurp(String curp) {
+        validarDatoPorNullYVacio(curp);
+
         PersonaModel persona = getPersonaPorCurp(curp)
                 .orElseThrow(() -> new RuntimeException("No se encontró a nadie con el CURP: " + curp));
         deletePersonaPorId(persona.id());
@@ -369,43 +383,40 @@ public class PersonaRepository {
 
 
     public List<PersonaModel> getPersonasPorNombre(String nombre, String apellidoPaterno, String apellidoMaterno) {
+       
+        validarDatoPorNullYVacio(apellidoMaterno);
+        validarDatoPorNullYVacio(apellidoPaterno);
+        validarDatoPorNullYVacio(nombre);
+    
         try {
-            Query query = firestore.collection(COLLECTION);
-
-            if (nombre != null && !nombre.isBlank()) {
-                query = query.whereEqualTo("nombre", nombre);
-            }
-            if (apellidoPaterno != null && !apellidoPaterno.isBlank()) {
-                query = query.whereEqualTo("apellidoPaterno", apellidoPaterno);
-            }
-            if (apellidoMaterno != null && !apellidoMaterno.isBlank()) {
-                query = query.whereEqualTo("apellidoMaterno", apellidoMaterno);
-            }
+           
+            Query query = firestore.collection(COLLECTION)
+                    .whereEqualTo("nombre", nombre)
+                    .whereEqualTo("apellidoPaterno", apellidoPaterno)
+                    .whereEqualTo("apellidoMaterno", apellidoMaterno);
                     
             ApiFuture<QuerySnapshot> future = query.get();
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-
+    
             List<PersonaModel> personasEncontradas = new ArrayList<>();
-
-            for (DocumentSnapshot document : documents) {
-                personasEncontradas.add(new PersonaModel(
-                        document.getId(),
-                        document.getString("nombre"),
-                        document.getString("apellidoPaterno"),
-                        document.getString("apellidoMaterno"),
-                        document.getString("fechaDeNacimiento"),
-                        document.getString("genero"),
-                        document.getString("estatusMigratorio"),
-                        document.getDouble("estatura"),
-                        document.getDouble("peso"),
-                        document.getString("telefono"),
-                        document.getString("email"),
-                        document.getString("curp"),
-                        document.getString("rfc"),
-                        document.getDouble("imc")
-                ));
-            }
-            
+                for (DocumentSnapshot document : documents) {
+                    personasEncontradas.add(new PersonaModel(
+                    document.getId(),
+                    document.getString("nombre"),
+                    document.getString("apellidoPaterno"),
+                    document.getString("apellidoMaterno"),
+                    document.getString("fechaDeNacimiento"),
+                    document.getString("genero"),
+                    document.getString("estatusMigratorio"),
+                    document.getDouble("estatura"),
+                    document.getDouble("peso"),
+                    document.getString("telefono"),
+                    document.getString("email"),
+                    document.getString("curp"),
+                    document.getString("rfc"),
+                    document.getDouble("imc")
+                    ));
+                    }    
             return personasEncontradas;
             
         } catch (InterruptedException | ExecutionException e) {
@@ -414,8 +425,9 @@ public class PersonaRepository {
     }
 
     public PersonaModel guardar(PersonaModel persona) {
+        validarPersona(persona);
         try {
-            // 1. Calculamos los datos usando los métodos que ya tienes en el Repositorio
+          
             Double pesoRedondeado = redondear(persona.peso());
             Double estaturaRedondeada = redondear(persona.estatura());
             String curpCalculado = generarCurp(persona);
@@ -424,7 +436,7 @@ public class PersonaRepository {
 
             DocumentReference documentReference = firestore.collection(COLLECTION).document();
             
-            // 2. Usamos HashMap porque Map.of explota si le pasas más de 10 datos
+           
             Map<String, Object> datos = new java.util.HashMap<>();
             datos.put("nombre", persona.nombre());
             datos.put("apellidoPaterno", persona.apellidoPaterno());
@@ -444,7 +456,6 @@ public class PersonaRepository {
             ApiFuture<WriteResult> future = documentReference.set(datos);
             future.get();
             
-            // 3. Retornamos el objeto con todos sus datos completos
             return new PersonaModel(
                     documentReference.getId(),
                     persona.nombre(),
