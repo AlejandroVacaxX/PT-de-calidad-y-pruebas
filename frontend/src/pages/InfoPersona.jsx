@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { navigate } from "../Link";
+import { API_URL } from "../consts";
 
 export default function InfoPersona() {
   const [persona, setPersona] = useState(null);
@@ -21,7 +22,7 @@ export default function InfoPersona() {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:8080/personas/personas-api/id/${id}`
+        `${API_URL}/id/${id}`
       );
 
       if (!response.ok) throw new Error("Persona no encontrada");
@@ -62,7 +63,7 @@ export default function InfoPersona() {
       // Nota: Si el usuario ve metros, lo dejamos igual. Si ve cm, dividimos.
       // Aqui asumiremos que el input muestra metros para mantener consistencia con la vista.
       
-      const response = await fetch(`http://localhost:8080/personas/personas-api/id/${id}`, {
+      const response = await fetch(`${API_URL}/id/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
@@ -87,7 +88,7 @@ export default function InfoPersona() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/personas/personas-api/id/${id}`, {
+      const response = await fetch(`${API_URL}/id/${id}`, {
         method: "DELETE"
       });
 
