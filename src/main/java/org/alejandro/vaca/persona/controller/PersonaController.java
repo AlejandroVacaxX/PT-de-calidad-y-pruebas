@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
     
     @RestController
-    @RequestMapping("personas/personas-api")
+    @RequestMapping("/personas/personas-api")
     public class PersonaController {
     private final PersonaService personaService;
     private final PersonaRepository personaRepository;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
         this.personaService = personaService;
     }
     // Todos los metodos GET
-    @GetMapping("/nombreTodos/{nombre}")
+    @GetMapping
         public List<PersonaModel> getPersonasPorNombre(
             @RequestParam(required = false) String nombre, 
             @RequestParam(required = false) String apellidoP, 
