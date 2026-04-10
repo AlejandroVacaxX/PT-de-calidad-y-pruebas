@@ -4,6 +4,7 @@ import InfoPersona from "./pages/InfoPersona.jsx";
 import { EVENTS } from "./consts.js";
 import { useEffect, useState } from "react";
 import ListadoPersonas from "./pages/ListadoPersonas.jsx";
+import Busqueda from "./pages/Busqueda.jsx";
 
 function App() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -35,6 +36,11 @@ function App() {
         <MainLayout>
           <InfoPersona/>
         </MainLayout>
+      )}
+      {currentPath === '/busqueda' && (
+          <MainLayout>
+            <Busqueda/>
+          </MainLayout>
       )}
       {!(currentPath === '/' || currentPath === '/listado' || currentPath === '/dashboard' || currentPath === '/registro' || currentPath.startsWith('/infopersona')) && (
         <div className="flex flex-col items-center justify-center h-screen">

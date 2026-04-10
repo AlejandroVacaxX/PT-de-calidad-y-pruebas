@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Firebase / credenciales (no subir al repositorio)
+serviceAccountKey.json
+
+# Build (Maven)
+target/
+
+# IntelliJ / Cursor (JetBrains)
+.idea/
