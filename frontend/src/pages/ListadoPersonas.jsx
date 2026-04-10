@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { navigate } from "../Link";
+import { API_URL } from "../consts";
 
 export default function ListadoPersonas() {
   const [personas, setPersonas] = useState([]);
@@ -14,7 +15,7 @@ export default function ListadoPersonas() {
   const obtenerPersonas = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8080/personas/personas-api");
+      const response = await fetch(API_URL);
       
       if (!response.ok) {
         throw new Error("Error en la respuesta del servidor");

@@ -1,0 +1,53 @@
+<<<<<<< Updated upstream
+# Dependencies
+node_modules/
+
+# Firebase / credenciales (no subir al repositorio)
+serviceAccountKey.json
+
+# Build (Maven)
+target/
+
+# IntelliJ / Cursor (JetBrains)
+.idea/
+=======
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+bin/
+
+## Donde va la api ##
+src/main/resources/serviceAccountKey.json
+*.class
+.settings/
+>>>>>>> Stashed changes

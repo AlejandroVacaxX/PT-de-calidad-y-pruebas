@@ -382,11 +382,37 @@ public class PersonaRepository {
     
 
 
-    public List<PersonaModel> getPersonasPorNombre(String nombre, String apellidoPaterno, String apellidoMaterno) {
+    public List<PersonaModel> getPersonasPorNombre(String nombre, String apellidoPaterno, String apellidoMaterno) { 
+        if (nombre == null && apellidoPaterno == null && apellidoMaterno == null) { 
+            try { 
+                ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION).get(); 
+                List<QueryDocumentSnapshot> documents = future.get().getDocuments(); 
+                List<PersonaModel> todas = new ArrayList<>(); 
+                for (DocumentSnapshot document : documents) { 
+                    todas.add(new PersonaModel( 
+                        document.getId(), 
+                        document.getString("nombre"), 
+                        document.getString("apellidoPaterno"), 
+                        document.getString("apellidoMaterno"), 
+                        document.getString("fechaDeNacimiento"), 
+                        document.getString("genero"), 
+                        document.getString("estatusMigratorio"), 
+                        document.getDouble("estatura"), 
+                        document.getDouble("peso"), 
+                        document.getString("telefono"), 
+                        document.getString("email"), 
+                        document.getString("curp"), 
+                        document.getString("rfc"), 
+                        document.getDouble("imc") 
+                    )); 
+                } 
+                return todas; 
+            } catch (Exception e) { throw new RuntimeException(e); } 
+        } 
        
-        validarDatoPorNullYVacio(apellidoMaterno);
-        validarDatoPorNullYVacio(apellidoPaterno);
-        validarDatoPorNullYVacio(nombre);
+        
+        
+        
     
         try {
            
