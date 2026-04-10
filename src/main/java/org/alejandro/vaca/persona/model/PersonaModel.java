@@ -27,11 +27,11 @@ public record PersonaModel(
 
 ) {
     public PersonaModel {
-        nombre = nombre == null ? null : nombre.trim().toLowerCase();
+        nombre = nombre == null ? null : nombre.trim();
         apellidoPaterno = apellidoPaterno == null ? null : apellidoPaterno.trim();
         apellidoMaterno = apellidoMaterno == null ? null : apellidoMaterno.trim();
-        genero = genero == null ? null : genero.trim().toLowerCase();
-        estatusMigratorio = estatusMigratorio == null ? null : estatusMigratorio.trim().toLowerCase();
+        genero = genero == null ? null : genero.trim();
+        estatusMigratorio = estatusMigratorio == null ? null : estatusMigratorio.trim();
         telefono = telefono == null ? null : telefono.trim().toLowerCase();
         email = email == null ? null : email.trim();
         curp = curp == null ? null : curp.trim();
@@ -56,8 +56,8 @@ public record PersonaModel(
                    RFC:             %s
                    IMC:             %s
                 ===================================================""",
-                id, nombre, apellidoPaterno, apellidoMaterno, 
-                fechaDeNacimiento, genero, estatusMigratorio, 
+                id, nombre, apellidoPaterno, apellidoMaterno,
+                fechaDeNacimiento, genero, estatusMigratorio,
                 estatura, peso, telefono, email,curp,rfc,imc);
     }
 

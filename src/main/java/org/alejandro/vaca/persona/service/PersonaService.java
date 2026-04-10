@@ -20,6 +20,10 @@ public class PersonaService {
         this.firestore = firestore;
     }
 
+    public List<PersonaModel> obtenerTodos(){
+        return personaRepository.obtenerTodos();
+    }
+
     public List<PersonaModel> getPersonasPorNombre(String nombre,String apellidoP,String apellidoM) {
         return personaRepository.getPersonasPorNombre(nombre,apellidoP,apellidoM);
     }

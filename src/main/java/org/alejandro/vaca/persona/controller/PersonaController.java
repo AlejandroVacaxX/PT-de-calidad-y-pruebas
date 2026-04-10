@@ -5,7 +5,6 @@ import org.alejandro.vaca.persona.model.PersonaModel;
 import org.alejandro.vaca.persona.repository.PersonaRepository;
 import java.util.List;
 
-     import org.springframework.web.bind.annotation.CrossOrigin;
      import org.springframework.web.bind.annotation.RequestParam;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,6 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
         this.personaService = personaService;
     }
     // Todos los metodos GET
+
+    @GetMapping
+    public List<PersonaModel> obtenerTodos() {
+        return personaService.obtenerTodos();
+    }
+
     @GetMapping("/nombreTodos/{nombre}")
         public List<PersonaModel> getPersonasPorNombre(
             @RequestParam(required = false) String nombre, 

@@ -35,6 +35,36 @@ public class PersonaRepository {
         this.firestore = fire;
     }
 
+    public List<PersonaModel> obtenerTodos() {
+        try {
+            CollectionReference collection = firestore.collection(COLLECTION);
+            ApiFuture<QuerySnapshot> future = collection.get();
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            List<PersonaModel> personas = new ArrayList<>();
+            for (DocumentSnapshot document : documents) {
+                personas.add(new PersonaModel(
+                        document.getId(),
+                        document.getString("nombre"),
+                        document.getString("apellidoPaterno"),
+                        document.getString("apellidoMaterno"),
+                        document.getString("fechaDeNacimiento"),
+                        document.getString("genero"),
+                        document.getString("estatusMigratorio"),
+                        document.getDouble("estatura"),
+                        document.getDouble("peso"),
+                        document.getString("telefono"),
+                        document.getString("email"),
+                        document.getString("curp"),
+                        document.getString("rfc"),
+                        document.getDouble("imc")
+                ));
+            }
+            return personas;
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException("No fue posible obtener las personas desde Firestore", e);
+        }
+    }
+
     public Double calcularIMC(Double peso, Double estatura) {
         if (estatura == null || estatura <= 0) return 0.0;
         double imc = peso / (estatura * estatura);

@@ -2,6 +2,7 @@ import { useState } from "react";
 
 export default function Registro() {
 
+  const today = new Date().toISOString().split("T")[0]; // constante para el calendario de la fecha
   const [form, setForm] = useState({
     nombre: "",
     apellidoPaterno: "",
@@ -202,6 +203,8 @@ export default function Registro() {
                 name="fechaDeNacimiento"
                 value={form.fechaDeNacimiento}
                 onChange={handleChange}
+                max={new Date().toISOString().split("T")[0]}
+
               />
             </div>
 
