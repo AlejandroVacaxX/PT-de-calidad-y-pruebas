@@ -1,8 +1,0 @@
-org\alejandro\vaca\persona\model\PersonaModel.class
-org\alejandro\vaca\persona\service\PersonaService.class
-org\alejandro\vaca\persona\controller\PersonaController.class
-org\alejandro\vaca\persona\Persona.class
-org\alejandro\vaca\persona\config\FirebaseConfig.class
-org\alejandro\vaca\persona\config\WebConfig.class
-org\alejandro\vaca\persona\config\GlobalExceptionHandler.class
-org\alejandro\vaca\persona\repository\PersonaRepository.class
