@@ -42,7 +42,7 @@ function App() {
             <Busqueda/>
           </MainLayout>
       )}
-      {!(currentPath === '/' || currentPath === '/listado' || currentPath === '/dashboard' || currentPath === '/registro' || currentPath.startsWith('/infopersona')) && (
+      {!(currentPath === '/' || currentPath === '/listado' || currentPath === '/dashboard' || currentPath === '/registro' || currentPath === '/busqueda' ||currentPath.startsWith('/infopersona')) && (
         <div className="flex flex-col items-center justify-center h-screen">
           <h1 className="text-4xl font-bold text-gray-800">404</h1>
           <p className="text-gray-500">Página no encontrada</p>
