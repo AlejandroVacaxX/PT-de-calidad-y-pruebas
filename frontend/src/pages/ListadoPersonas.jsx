@@ -7,6 +7,11 @@ export default function ListadoPersonas() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const nombreMayuscula  = (text) =>{
+    if (!text) return "";
+    return text.toLowerCase().split(" ").map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1)).join(" ");
+  }
+
   const handleNavigation = (path) => {
     navigate(path);
   };
@@ -16,11 +21,11 @@ export default function ListadoPersonas() {
     try {
       setLoading(true);
       const response = await fetch(API_URL);
-      
+
       if (!response.ok) {
         throw new Error("Error en la respuesta del servidor");
       }
-      
+
       const data = await response.json();
       setPersonas(data);
     } catch (err) {
@@ -42,7 +47,7 @@ export default function ListadoPersonas() {
           <h1 className="text-3xl font-bold text-blue-900">Listado de Personas</h1>
           <p className="text-gray-500">Consulta y gestiona los perfiles registrados</p>
         </div>
-        <button 
+        <button
           onClick={() => handleNavigation("/registro")}
           className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
         >
@@ -75,18 +80,20 @@ export default function ListadoPersonas() {
                 onClick={() => handleNavigation(`/infopersona/${persona.id}`)}
                 className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md border border-transparent hover:border-blue-200 cursor-pointer transition-all flex flex-col justify-between"
               >
-                <div>
+                <div> 
                   <div className="flex justify-between items-start mb-2">
                     <span className="px-2 py-1 text-xs font-bold uppercase tracking-wider rounded bg-blue-100 text-blue-700">
                       {persona.genero || "No especificado"}
                     </span>
                   </div>
                   <h2 className="text-xl font-bold text-blue-900 mb-1">
-                    {persona.nombre} {persona.apellidoPaterno} {persona.apellidoMaterno}
+                    {nombreMayuscula(persona.nombre)}{" "}
+                    {nombreMayuscula(persona.apellidoPaterno)}{" "}
+                    {nombreMayuscula(persona.apellidoMaterno)}
                   </h2>
                   <p className="text-sm text-gray-500 mb-4">{persona.email}</p>
                 </div>
-                
+
                 <div className="flex items-center text-blue-600 text-sm font-semibold">
                   Ver detalle completo →
                 </div>
@@ -96,7 +103,7 @@ export default function ListadoPersonas() {
             /* Estado vacio si no hay registros */
             <div className="col-span-full bg-white p-12 rounded-2xl shadow text-center">
               <p className="text-gray-500 text-lg">No se encontraron personas registradas.</p>
-              <button 
+              <button
                 onClick={() => handleNavigation("/registro")}
                 className="mt-4 text-blue-600 font-bold hover:underline"
               >

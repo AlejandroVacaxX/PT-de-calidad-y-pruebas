@@ -9,6 +9,11 @@ export default function InfoPersona() {
   const [editando, setEditando] = useState(false);
   const [formData, setFormData] = useState({});
 
+  const nombreMayuscula  = (text) =>{
+    if (!text) return "";
+    return text.toLowerCase().split(" ").map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1)).join(" ");
+  }
+
   // Extraemos el ID de la URL
   const pathParts = window.location.pathname.split("/").filter(Boolean);
   const id = pathParts[pathParts.length - 1];
@@ -62,7 +67,7 @@ export default function InfoPersona() {
       // Ajuste de estatura si se cambio (convertir de cm a metros si es necesario)
       // Nota: Si el usuario ve metros, lo dejamos igual. Si ve cm, dividimos.
       // Aqui asumiremos que el input muestra metros para mantener consistencia con la vista.
-      
+
       const response = await fetch(`${API_URL}/id/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -93,7 +98,7 @@ export default function InfoPersona() {
       });
 
       if (!response.ok) throw new Error("Error al eliminar");
-      
+
       alert("Persona eliminada correctamente");
       handleNavigation("/");
     } catch (err) {
@@ -114,8 +119,8 @@ export default function InfoPersona() {
       <div className="p-8 text-center bg-gray-100 min-h-screen">
         <div className="bg-white p-10 rounded-2xl shadow-lg inline-block">
           <p className="text-red-500 font-bold text-xl mb-4">⚠️ No se encontro la informacion.</p>
-          <button 
-            onClick={() => handleNavigation("/")} 
+          <button
+            onClick={() => handleNavigation("/")}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             Regresar al listado
@@ -139,13 +144,13 @@ export default function InfoPersona() {
         <div className="flex gap-3">
           {!editando ? (
             <>
-              <button 
+              <button
                 onClick={() => setEditando(true)}
                 className="px-4 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition font-medium"
               >
                 Editar Perfil
               </button>
-              <button 
+              <button
                 onClick={handleEliminar}
                 className="px-4 py-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition font-medium"
               >
@@ -154,13 +159,13 @@ export default function InfoPersona() {
             </>
           ) : (
             <>
-              <button 
+              <button
                 onClick={() => setEditando(false)}
                 className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition font-medium"
               >
                 Cancelar
               </button>
-              <button 
+              <button
                 onClick={handleGuardarCambios}
                 className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition font-medium shadow-md"
               >
@@ -175,33 +180,35 @@ export default function InfoPersona() {
       <section className="bg-white p-8 rounded-2xl shadow-sm mb-6 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-6">
           <div className="w-24 h-24 bg-blue-900 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-inner">
-            {persona.nombre?.charAt(0)}{persona.apellidoPaterno?.charAt(0)}
+            {persona.nombre?.charAt(0).toUpperCase()}{persona.apellidoPaterno?.charAt(0).toUpperCase()}
           </div>
 
           <div>
             {!editando ? (
               <h1 className="text-3xl font-bold text-blue-900 leading-tight">
-                {persona.nombre} {persona.apellidoPaterno} {persona.apellidoMaterno}
+                    {nombreMayuscula(persona.nombre)}{" "}
+                    {nombreMayuscula(persona.apellidoPaterno)}{" "}
+                    {nombreMayuscula(persona.apellidoMaterno)}
               </h1>
             ) : (
               <div className="flex gap-2">
-                <input 
-                  className="p-1 border rounded text-lg font-bold text-blue-900 w-32" 
-                  name="nombre" 
-                  value={formData.nombre} 
-                  onChange={handleChange} 
+                <input
+                  className="p-1 border rounded text-lg font-bold text-blue-900 w-32"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleChange}
                 />
-                <input 
-                  className="p-1 border rounded text-lg font-bold text-blue-900 w-32" 
-                  name="apellidoPaterno" 
-                  value={formData.apellidoPaterno} 
-                  onChange={handleChange} 
+                <input
+                  className="p-1 border rounded text-lg font-bold text-blue-900 w-32"
+                  name="apellidoPaterno"
+                  value={formData.apellidoPaterno}
+                  onChange={handleChange}
                 />
-                <input 
-                  className="p-1 border rounded text-lg font-bold text-blue-900 w-32" 
-                  name="apellidoMaterno" 
-                  value={formData.apellidoMaterno} 
-                  onChange={handleChange} 
+                <input
+                  className="p-1 border rounded text-lg font-bold text-blue-900 w-32"
+                  name="apellidoMaterno"
+                  value={formData.apellidoMaterno}
+                  onChange={handleChange}
                 />
               </div>
             )}
@@ -236,13 +243,13 @@ export default function InfoPersona() {
               {!editando ? (
                 <p className="text-blue-900 font-semibold text-lg">{persona.fechaDeNacimiento || "No registrada"}</p>
               ) : (
-                <input 
-                  className="w-full p-2 border rounded-lg" 
-                  type="text" 
-                  name="fechaDeNacimiento" 
+                <input
+                  className="w-full p-2 border rounded-lg"
+                  type="text"
+                  name="fechaDeNacimiento"
                   placeholder="dd/MM/yyyy"
-                  value={formData.fechaDeNacimiento} 
-                  onChange={handleChange} 
+                  value={formData.fechaDeNacimiento}
+                  onChange={handleChange}
                 />
               )}
             </div>
@@ -252,10 +259,10 @@ export default function InfoPersona() {
               {!editando ? (
                 <p className="text-blue-900 font-semibold text-lg">{persona.genero}</p>
               ) : (
-                <select 
-                  className="w-full p-2 border rounded-lg" 
-                  name="genero" 
-                  value={formData.genero} 
+                <select
+                  className="w-full p-2 border rounded-lg"
+                  name="genero"
+                  value={formData.genero}
                   onChange={handleChange}
                 >
                   <option>Masculino</option>
@@ -274,10 +281,10 @@ export default function InfoPersona() {
                   </span>
                 </div>
               ) : (
-                <select 
-                  className="w-full p-2 border rounded-lg" 
-                  name="estatusMigratorio" 
-                  value={formData.estatusMigratorio} 
+                <select
+                  className="w-full p-2 border rounded-lg"
+                  name="estatusMigratorio"
+                  value={formData.estatusMigratorio}
                   onChange={handleChange}
                 >
                   <option>Mexicano</option>
@@ -297,20 +304,20 @@ export default function InfoPersona() {
                 </p>
               ) : (
                 <div className="flex gap-2">
-                  <input 
-                    className="w-1/2 p-2 border rounded-lg" 
-                    type="number" 
-                    step="0.01" 
-                    name="estatura" 
-                    value={formData.estatura} 
-                    onChange={handleChange} 
+                  <input
+                    className="w-1/2 p-2 border rounded-lg"
+                    type="number"
+                    step="0.01"
+                    name="estatura"
+                    value={formData.estatura}
+                    onChange={handleChange}
                   />
-                  <input 
-                    className="w-1/2 p-2 border rounded-lg" 
-                    type="number" 
-                    name="peso" 
-                    value={formData.peso} 
-                    onChange={handleChange} 
+                  <input
+                    className="w-1/2 p-2 border rounded-lg"
+                    type="number"
+                    name="peso"
+                    value={formData.peso}
+                    onChange={handleChange}
                   />
                 </div>
               )}
@@ -321,12 +328,12 @@ export default function InfoPersona() {
               {!editando ? (
                 <p className="text-blue-900 font-semibold text-lg">{persona.telefono || "Sin telefono"}</p>
               ) : (
-                <input 
-                  className="w-full p-2 border rounded-lg" 
-                  type="text" 
-                  name="telefono" 
-                  value={formData.telefono} 
-                  onChange={handleChange} 
+                <input
+                  className="w-full p-2 border rounded-lg"
+                  type="text"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleChange}
                 />
               )}
             </div>
@@ -336,12 +343,12 @@ export default function InfoPersona() {
               {!editando ? (
                 <p className="text-blue-600 font-semibold text-lg hover:underline cursor-pointer">{persona.email}</p>
               ) : (
-                <input 
-                  className="w-full p-2 border rounded-lg" 
-                  type="email" 
-                  name="email" 
-                  value={formData.email} 
-                  onChange={handleChange} 
+                <input
+                  className="w-full p-2 border rounded-lg"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                 />
               )}
             </div>
