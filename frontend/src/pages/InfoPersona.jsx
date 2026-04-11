@@ -218,13 +218,6 @@ export default function InfoPersona() {
             </div>
           </div>
         </div>
-
-        {!editando && (
-          <div className="bg-green-50 px-4 py-2 rounded-full border border-green-100 flex items-center gap-2">
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            <p className="text-xs text-green-700 font-bold uppercase tracking-wider">Perfil Activo</p>
-          </div>
-        )}
       </section>
 
       {/* CONTENIDO PRINCIPAL */}
