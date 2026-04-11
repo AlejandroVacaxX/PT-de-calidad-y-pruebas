@@ -410,10 +410,6 @@ public class PersonaRepository {
             } catch (Exception e) { throw new RuntimeException(e); } 
         } 
        
-        
-        
-        
-    
         try {
            
             Query query = firestore.collection(COLLECTION)

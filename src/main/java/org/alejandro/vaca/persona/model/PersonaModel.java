@@ -28,8 +28,8 @@ public record PersonaModel(
 ) {
     public PersonaModel {
         nombre = nombre == null ? null : nombre.trim().toLowerCase();
-        apellidoPaterno = apellidoPaterno == null ? null : apellidoPaterno.trim();
-        apellidoMaterno = apellidoMaterno == null ? null : apellidoMaterno.trim();
+        apellidoPaterno = apellidoPaterno == null ? null : apellidoPaterno.trim().toLowerCase();
+        apellidoMaterno = apellidoMaterno == null ? null : apellidoMaterno.trim().toLowerCase();
         genero = genero == null ? null : genero.trim().toLowerCase();
         estatusMigratorio = estatusMigratorio == null ? null : estatusMigratorio.trim().toLowerCase();
         telefono = telefono == null ? null : telefono.trim().toLowerCase();
