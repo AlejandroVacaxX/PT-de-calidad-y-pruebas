@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { navigate } from "../Link";
 import {
     FiSearch,
@@ -6,6 +6,7 @@ import {
     FiAlertCircle,
     FiHelpCircle,
     FiLock,
+    FiChevronDown
 } from "react-icons/fi";
 
 const PRIMARY = "#003366";
@@ -16,6 +17,10 @@ export default function Busqueda() {
     const [valor, setValor] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    // --- NUEVOS ESTADOS PARA EL SELECT DE IDs ---
+    const [opcionesIds, setOpcionesIds] = useState([]);
+    const [cargandoIds, setCargandoIds] = useState(false);
 
     const nombreMayuscula = (text) =>{
         if(!text) return "";
@@ -33,16 +38,37 @@ export default function Busqueda() {
 
     const [mostrarResultado, setMostrarResultado] = useState(false);
 
-    const placeholder =
-        modo === "id"
-            ? "Ej. EjpfCp3ZuM5b6nuTH3mx"
-            : modo === "curp"
-                ? "Ej. VAMR850101HDFRLN09"
-                : modo === "rfc"
-                    ? "Ej. VAMR850101ABC"
-                    : "Ej. Juan";
+    // --- EFECTO PARA CARGAR LOS IDs DISPONIBLES AL INICIO ---
+    useEffect(() => {
+        const cargarIds = async () => {
+            setCargandoIds(true);
+            try {
+                // Ajusta este endpoint si tienes uno específico que solo devuelva una lista de IDs.
+                // Aquí asumo que consultas la lista general de personas.
+                const response = await fetch("http://localhost:8080/personas/personas-api");
+                if (response.ok) {
+                    const data = await response.json();
+                    // Extraemos solo los IDs del arreglo de datos
+                    const idsDisponibles = data.map(item => item.id).filter(id => id);
+                    setOpcionesIds(idsDisponibles);
+                }
+            } catch (err) {
+                console.error("Error al cargar la lista de IDs:", err);
+            } finally {
+                setCargandoIds(false);
+            }
+        };
 
-    // --- NUEVA FUNCIÓN PARA BUSCAR POR ID ---
+        cargarIds();
+    }, []);
+
+    const placeholder =
+        modo === "curp"
+            ? "Ej. VAMR850101HDFRLN09"
+            : modo === "rfc"
+                ? "Ej. VAMR850101ABC"
+                : "Ej. Juan";
+
     const buscarPorId = async (idBusqueda) => {
         try {
             setLoading(true);
@@ -145,7 +171,6 @@ export default function Busqueda() {
         }
     }
 
-
     const handleConsultar = async (e) => {
         e.preventDefault();
 
@@ -167,7 +192,7 @@ export default function Busqueda() {
             const valorNormalizado = modo === "id" ? valor.trim() : valor.trim().toUpperCase();
 
             if (!valorNormalizado) {
-                setError("Ingresa un valor para buscar.");
+                setError("Ingresa o selecciona un valor para buscar.");
                 setMostrarResultado(false);
                 setPersona(null);
                 return;
@@ -204,7 +229,7 @@ export default function Busqueda() {
                     Consulta por Identificador
                 </h1>
                 <p className="text-slate-600 max-w-2xl text-[15px] leading-relaxed">
-                    Ingrese un ID, CURP, RFC o Nombre para localizar el registro en el sistema
+                    Seleccione un ID, o ingrese un CURP, RFC o Nombre para localizar el registro en el sistema
                     y visualizar un resumen del perfil asociado.
                 </p>
             </header>
@@ -250,8 +275,6 @@ export default function Busqueda() {
                             Nombre
                         </button>
                         
-                       
-
                         <button
                             type="button"
                             onClick={() => {
@@ -284,8 +307,10 @@ export default function Busqueda() {
 
                     <form onSubmit={handleConsultar} className="space-y-4">
 
-                        {/* Renderizado condicional de los inputs */}
-                        {modo === "nombre" ? (
+                        {/* Renderizado condicional separado para mayor claridad */}
+                        
+                        {/* FORMULARIO DE NOMBRE */}
+                        {modo === "nombre" && (
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: PRIMARY }} htmlFor="nombre">
@@ -332,16 +357,54 @@ export default function Busqueda() {
                                     </div>
                                 </div>
                             </div>
-                        ) : (
+                        )}
+
+                        {/* FORMULARIO DE ID (SELECT) */}
+                        {modo === "id" && (
+                            <div>
+                                <label
+                                    className="block text-xs font-bold uppercase tracking-wider mb-2"
+                                    style={{ color: PRIMARY }}
+                                    htmlFor="identificador_select"
+                                >
+                                    Identificador Único (ID)
+                                </label>
+                                <div className="relative">
+                                    <select
+                                        id="identificador_select"
+                                        value={valor}
+                                        onChange={(e) => {
+                                            setValor(e.target.value);
+                                            if (error) setError("");
+                                        }}
+                                        className="w-full rounded-xl bg-slate-100 border-0 px-4 py-3.5 text-slate-800 focus:ring-2 focus:ring-blue-900/20 focus:outline-none font-mono appearance-none"
+                                        disabled={cargandoIds}
+                                    >
+                                        <option value="" disabled>
+                                            {cargandoIds ? "Cargando IDs..." : "-- Seleccione un ID registrado --"}
+                                        </option>
+                                        {opcionesIds.map((opcionId) => (
+                                            <option key={opcionId} value={opcionId}>
+                                                {opcionId}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center pointer-events-none text-slate-400">
+                                        <FiChevronDown className="w-5 h-5" aria-hidden />
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* FORMULARIO DE CURP / RFC */}
+                        {(modo === "curp" || modo === "rfc") && (
                             <div>
                                 <label
                                     className="block text-xs font-bold uppercase tracking-wider mb-2"
                                     style={{ color: PRIMARY }}
                                     htmlFor="identificador"
                                 >
-                                    {modo === "id"
-                                        ? "Identificador Único (ID)"
-                                        : modo === "curp"
+                                    {modo === "curp"
                                         ? "Clave Única de Registro de Población"
                                         : "Registro Federal de Contribuyentes"}
                                 </label>
@@ -351,16 +414,15 @@ export default function Busqueda() {
                                         type="text"
                                         value={valor}
                                         onChange={(e) => {
-                                            // No forzamos mayúsculas si es un ID por si acaso fuera un UUID con minúsculas
-                                            setValor(modo === "id" ? e.target.value : e.target.value.toUpperCase());
+                                            setValor(e.target.value.toUpperCase());
                                             if (error) setError("");
                                         }}
                                         placeholder={placeholder}
-                                        className={`w-full rounded-xl bg-slate-100 border-0 px-4 py-3.5 pr-36 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:outline-none font-mono ${modo !== "id" ? "uppercase" : ""}`}
+                                        className="w-full rounded-xl bg-slate-100 border-0 px-4 py-3.5 pr-36 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:outline-none font-mono uppercase"
                                         autoComplete="off"
                                     />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-tight text-slate-400">
-                                        {modo === "id" ? "Valor Exacto" : modo === "curp" ? "18 chars requeridos" : "12–13 chars"}
+                                        {modo === "curp" ? "18 chars requeridos" : "12–13 chars"}
                                         <FiSearch className="w-3.5 h-3.5 opacity-60" aria-hidden />
                                     </span>
                                 </div>
@@ -379,8 +441,8 @@ export default function Busqueda() {
 
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:opacity-95 mt-4"
+                            disabled={loading || (modo === "id" && !valor)}
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:opacity-95 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                             style={{ backgroundColor: PRIMARY }}
                         >
                             <FiSearch className="w-5 h-5" />
@@ -401,7 +463,7 @@ export default function Busqueda() {
                         Ayuda técnica
                     </h3>
                     <p className="text-sm text-slate-700 leading-relaxed mb-4">
-                        Puede realizar su búsqueda utilizando el ID interno del sistema, un CURP (18 caracteres), un RFC (10 caracteres, sin homoclave), o ingresando los nombres y apellidos de la persona.
+                        Puede realizar su búsqueda seleccionando el ID interno desde la lista desplegable, o ingresando un CURP (18 caracteres), un RFC (10 caracteres, sin homoclave), o los nombres y apellidos de la persona.
                     </p>
                     <FiHelpCircle
                         className="absolute -bottom-2 -right-2 w-40 h-40 text-blue-900/5 pointer-events-none"
