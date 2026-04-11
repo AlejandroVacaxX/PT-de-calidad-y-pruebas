@@ -3,4 +3,4 @@ export const EVENTS = {
     POPSTATE: "popstate",
   };
 
-export const API_URL = "http://localhost:8080/personas/personas-api";
+export const API_URL = "/personas/personas-api";

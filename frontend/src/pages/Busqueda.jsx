@@ -45,7 +45,7 @@ export default function Busqueda() {
             try {
                 // Ajusta este endpoint si tienes uno específico que solo devuelva una lista de IDs.
                 // Aquí asumo que consultas la lista general de personas.
-                const response = await fetch("http://localhost:8080/personas/personas-api");
+                const response = await fetch("/personas/personas-api");
                 if (response.ok) {
                     const data = await response.json();
                     // Extraemos solo los IDs del arreglo de datos
@@ -73,7 +73,7 @@ export default function Busqueda() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:8080/personas/personas-api/id/${encodeURIComponent(idBusqueda)}`
+                `/personas/personas-api/id/${encodeURIComponent(idBusqueda)}`
             );
 
             if (!response.ok) throw new Error("Persona no encontrada");
@@ -95,7 +95,7 @@ export default function Busqueda() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:8080/personas/personas-api/curp/${encodeURIComponent(curp)}`
+                `/personas/personas-api/curp/${encodeURIComponent(curp)}`
             );
 
             if (!response.ok) throw new Error("Persona no encontrada");
@@ -117,7 +117,7 @@ export default function Busqueda() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:8080/personas/personas-api/rfc/${encodeURIComponent(rfc)}`
+                `/personas/personas-api/rfc/${encodeURIComponent(rfc)}`
             );
 
             if (!response.ok) throw new Error("Persona no encontrada");
@@ -143,7 +143,7 @@ export default function Busqueda() {
             if(apellidoP) params.append("apellidoP", apellidoP);
             if(apellidoM) params.append("apellidoM", apellidoM);
 
-            const url = `http://localhost:8080/personas/personas-api?${params.toString()}`;
+            const url = `/personas/personas-api?${params.toString()}`;
             const response = await fetch(url);
 
             if(!response.ok) throw new Error("No se encontraron personas");
