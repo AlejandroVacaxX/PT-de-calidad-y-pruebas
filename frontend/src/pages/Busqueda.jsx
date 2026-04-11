@@ -12,7 +12,7 @@ const PRIMARY = "#003366";
 const LIGHT_BLUE = "#E6F0FF";
 
 export default function Busqueda() {
-    const [modo, setModo] = useState("nombre"); // "curp" | "rfc" | "nombre"
+    const [modo, setModo] = useState("id"); // "curp" | "rfc" | "nombre" | "id"
     const [valor, setValor] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -20,9 +20,9 @@ export default function Busqueda() {
     const nombreMayuscula = (text) =>{
         if(!text) return "";
         return text.toLowerCase().split(" ").map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1)).join(" ");
-      }
+    }
 
-    // Estados para CURP/RFC
+    // Estados para CURP/RFC/ID
     const [persona, setPersona] = useState(null);
 
     // Estados añadidos para NOMBRE
@@ -34,11 +34,36 @@ export default function Busqueda() {
     const [mostrarResultado, setMostrarResultado] = useState(false);
 
     const placeholder =
-        modo === "curp"
-            ? "Ej. VAMR850101HDFRLN09"
-            : modo === "rfc"
-                ? "Ej. VAMR850101ABC"
-                : "Ej. Juan";
+        modo === "id"
+            ? "Ej. EjpfCp3ZuM5b6nuTH3mx"
+            : modo === "curp"
+                ? "Ej. VAMR850101HDFRLN09"
+                : modo === "rfc"
+                    ? "Ej. VAMR850101ABC"
+                    : "Ej. Juan";
+
+    // --- NUEVA FUNCIÓN PARA BUSCAR POR ID ---
+    const buscarPorId = async (idBusqueda) => {
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `http://localhost:8080/personas/personas-api/id/${encodeURIComponent(idBusqueda)}`
+            );
+
+            if (!response.ok) throw new Error("Persona no encontrada");
+            const data = await response.json();
+            setPersona(data);
+            setMostrarResultado(true);
+            setError("");
+        } catch (err) {
+            console.error("Error al obtener los datos:", err);
+            setPersona(null);
+            setMostrarResultado(false);
+            setError("No se encontró una persona con ese ID.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const validarCurp = async (curp) => {
         try {
@@ -92,16 +117,12 @@ export default function Busqueda() {
             if(apellidoP) params.append("apellidoP", apellidoP);
             if(apellidoM) params.append("apellidoM", apellidoM);
 
-            console.log("Datos que se enviarán:", { nombre, apellidoP, apellidoM });
-
-            // CORRECCIÓN NECESARIA: Se cambió el "/" por "?" para que se envíen bien los query params
             const url = `http://localhost:8080/personas/personas-api?${params.toString()}`;
             const response = await fetch(url);
 
             if(!response.ok) throw new Error("No se encontraron personas");
             const data = await response.json();
 
-            // Código descomentado y adaptado
             if(Array.isArray(data) && data.length > 0){
                 setPersonas(data);
                 setPersona(null);
@@ -142,7 +163,8 @@ export default function Busqueda() {
             await buscarPorNombre(nommbreNormalizado, apellidoPNormalizado, apellidoMNormalizado);
 
         } else {
-            const valorNormalizado = valor.trim().toUpperCase();
+            // Para ID, CURP y RFC usamos el campo 'valor'
+            const valorNormalizado = modo === "id" ? valor.trim() : valor.trim().toUpperCase();
 
             if (!valorNormalizado) {
                 setError("Ingresa un valor para buscar.");
@@ -155,12 +177,22 @@ export default function Busqueda() {
                 await validarCurp(valorNormalizado);
             } else if(modo === "rfc"){
                 await validarRfc(valorNormalizado);
+            } else if(modo === "id"){
+                await buscarPorId(valorNormalizado);
             }
         }
     };
 
     // Variable auxiliar para iterar los resultados de forma dinámica
     const resultadosAMostrar = modo === "nombre" ? personas : (persona ? [persona] : []);
+
+    const limpiarEstados = () => {
+        setError("");
+        setMostrarResultado(false);
+        setPersona(null);
+        setPersonas([]);
+        setValor("");
+    };
 
     return (
         <div className="p-8 max-w-6xl mx-auto">
@@ -172,7 +204,7 @@ export default function Busqueda() {
                     Consulta por Identificador
                 </h1>
                 <p className="text-slate-600 max-w-2xl text-[15px] leading-relaxed">
-                    Ingrese un CURP, RFC o Nombre para localizar el registro en el sistema
+                    Ingrese un ID, CURP, RFC o Nombre para localizar el registro en el sistema
                     y visualizar un resumen del perfil asociado.
                 </p>
             </header>
@@ -184,62 +216,69 @@ export default function Busqueda() {
                     style={{ boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.08)" }}
                 >
                     <div
-                        className="inline-flex flex-wrap rounded-xl md:rounded-full p-1 mb-6"
+                        className="inline-flex flex-wrap rounded-xl md:rounded-full p-1 mb-6 gap-1"
                         style={{ backgroundColor: LIGHT_BLUE }}
                     >
+                         <button
+                            type="button"
+                            onClick={() => {
+                                setModo("id");
+                                limpiarEstados();
+                            }}
+                            className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+                                modo === "id"
+                                    ? "bg-white text-blue-900 shadow-sm"
+                                    : "text-slate-600 hover:text-slate-800"
+                            }`}
+                        >
+                            ID
+                        </button>
                         <button
                             type="button"
                             onClick={()=>{
                                 setModo("nombre");
-                                setError("");
-                                setMostrarResultado(false);
-                                setPersona(null);
-                                setPersonas([]);
+                                limpiarEstados();
                             }}
                             className={
-                                `px-5 py-2 rounded-full text-sm font-semibold transition-colors ${
+                                `px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
                                     modo === "nombre"
                                         ? "bg-white text-blue-900 shadow-sm"
                                         : "text-slate-600 hover:text-slate-800"
                                 }`
                             }
                         >
-                            Búsqueda por Nombre
+                            Nombre
                         </button>
+                        
+                       
 
                         <button
                             type="button"
                             onClick={() => {
                                 setModo("curp");
-                                setError("");
-                                setMostrarResultado(false);
-                                setPersona(null);
-                                setPersonas([]);
+                                limpiarEstados();
                             }}
-                            className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors ${
+                            className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
                                 modo === "curp"
                                     ? "bg-white text-blue-900 shadow-sm"
                                     : "text-slate-600 hover:text-slate-800"
                             }`}
                         >
-                            Búsqueda por CURP
+                            CURP
                         </button>
                         <button
                             type="button"
                             onClick={() => {
                                 setModo("rfc");
-                                setError("");
-                                setMostrarResultado(false);
-                                setPersona(null);
-                                setPersonas([]);
+                                limpiarEstados();
                             }}
-                            className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors ${
+                            className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
                                 modo === "rfc"
                                     ? "bg-white text-blue-900 shadow-sm"
                                     : "text-slate-600 hover:text-slate-800"
                             }`}
                         >
-                            Búsqueda por RFC
+                            RFC
                         </button>
                     </div>
 
@@ -300,7 +339,9 @@ export default function Busqueda() {
                                     style={{ color: PRIMARY }}
                                     htmlFor="identificador"
                                 >
-                                    {modo === "curp"
+                                    {modo === "id"
+                                        ? "Identificador Único (ID)"
+                                        : modo === "curp"
                                         ? "Clave Única de Registro de Población"
                                         : "Registro Federal de Contribuyentes"}
                                 </label>
@@ -310,15 +351,16 @@ export default function Busqueda() {
                                         type="text"
                                         value={valor}
                                         onChange={(e) => {
-                                            setValor(e.target.value.toUpperCase());
+                                            // No forzamos mayúsculas si es un ID por si acaso fuera un UUID con minúsculas
+                                            setValor(modo === "id" ? e.target.value : e.target.value.toUpperCase());
                                             if (error) setError("");
                                         }}
                                         placeholder={placeholder}
-                                        className="w-full rounded-xl bg-slate-100 border-0 px-4 py-3.5 pr-36 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:outline-none font-mono uppercase"
+                                        className={`w-full rounded-xl bg-slate-100 border-0 px-4 py-3.5 pr-36 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:outline-none font-mono ${modo !== "id" ? "uppercase" : ""}`}
                                         autoComplete="off"
                                     />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-tight text-slate-400">
-                                        {modo === "curp" ? "18 chars requeridos" : "12–13 chars"}
+                                        {modo === "id" ? "Valor Exacto" : modo === "curp" ? "18 chars requeridos" : "12–13 chars"}
                                         <FiSearch className="w-3.5 h-3.5 opacity-60" aria-hidden />
                                     </span>
                                 </div>
@@ -359,8 +401,7 @@ export default function Busqueda() {
                         Ayuda técnica
                     </h3>
                     <p className="text-sm text-slate-700 leading-relaxed mb-4">
-                        El CURP consta de 18 caracteres alfanuméricos. El RFC para persona
-                        física suele tener 13 caracteres (homoclave de 3). Para la búsqueda por nombre, ingrese uno o varios apellidos.
+                        Puede realizar su búsqueda utilizando el ID interno del sistema, un CURP (18 caracteres), un RFC (13 caracteres), o ingresando los nombres y apellidos de la persona.
                     </p>
                     <a
                         href="#"
