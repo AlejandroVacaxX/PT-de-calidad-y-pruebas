@@ -471,7 +471,8 @@ public class PersonaIntegrationTest {
         mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post(BASE_URL)
                 .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
                 .content(personaJovenJson))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("La persona debe ser mayor de 16 años para generar el RFC"));
     }
 
     @ParameterizedTest
