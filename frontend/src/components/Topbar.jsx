@@ -1,5 +1,3 @@
-import { FiSearch, FiBell, FiChevronDown } from 'react-icons/fi';
-
 // Recibimos la "prop" titulo. Si no nos mandan nada, por defecto dirá "Dashboard"
 export const Topbar = ({ titulo = "Dashboard" }) => {
   return (
