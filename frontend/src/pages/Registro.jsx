@@ -53,7 +53,7 @@ export default function Registro() {
         genero: mapeoGenero[form.genero] || form.genero.toLowerCase(),
         estatusMigratorio: mapeoEstatus[form.estatusMigratorio] || form.estatusMigratorio.toLowerCase().replace(/\s+/g, ''),
         fechaDeNacimiento: formatearFecha(form.fechaDeNacimiento),
-        estatura: parseFloat(form.estatura) / 100, // Convertir cm a metros
+        estatura: parseFloat(form.estatura), // Convertir cm a metros, esta mamada esta fallando porque ya se pasa en metros
         peso: parseFloat(form.peso),
         // Aseguramos que el telefono solo tenga numeros para el regex ^(55\d{8})$
         telefono: form.telefono.replace(/\D/g, '')

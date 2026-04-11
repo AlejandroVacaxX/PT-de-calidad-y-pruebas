@@ -3,7 +3,6 @@ package org.alejandro.vaca.persona.controller;
 import java.util.List;
 
 import org.alejandro.vaca.persona.model.PersonaModel;
-import org.alejandro.vaca.persona.repository.PersonaRepository;
 import org.alejandro.vaca.persona.service.PersonaService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,26 +16,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
     
-    @RestController
-    @RequestMapping("personas/personas-api")
-    public class PersonaController {
+@RestController
+@RequestMapping("personas/personas-api")
+public class PersonaController {
     private final PersonaService personaService;
-    private final PersonaRepository personaRepository;
 
-    public PersonaController(PersonaService personaService, PersonaRepository personaRepository) {
-        this.personaRepository = personaRepository;
+    public PersonaController(PersonaService personaService) {
         this.personaService = personaService;
     }
 
-    // Todos los metodos GET
     @GetMapping
-        public List<PersonaModel> getPersonasPorNombre(
-            @RequestParam(required = false) String nombre, 
-            @RequestParam(required = false) String apellidoP, 
-            @RequestParam(required = false) String apellidoM
-        ) {
-            return personaService.getPersonasPorNombre(nombre, apellidoP, apellidoM);
-        }
+    public List<PersonaModel> getPersonasPorNombre(
+        @RequestParam(required = false) String nombre, 
+        @RequestParam(required = false) String apellidoP, 
+        @RequestParam(required = false) String apellidoM
+    ) {
+        return personaService.getPersonasPorNombre(nombre, apellidoP, apellidoM);
+    }
+
     @GetMapping("/id/{id}")
     public PersonaModel obtenerPersonaPorId(@PathVariable String id) {
         return personaService.buscarPersonaPorId(id);
@@ -44,24 +41,19 @@ import jakarta.validation.Valid;
 
     @GetMapping("/curp/{curp}")
     public PersonaModel obtenerPersonaPorCurp(@PathVariable String curp) {
-        return personaRepository.getPersonaPorCurp(curp)
-                .orElseThrow(() -> new IllegalArgumentException("El curp" + curp + " No Existe"));
+        return personaService.buscarPersonaPorCurp(curp);
     }
 
     @GetMapping("/rfc/{rfc}")
     public PersonaModel obtenerPersonaPorRfc(@PathVariable String rfc) {
-        return personaRepository.getPersonaPorRFC(rfc)
-                .orElseThrow(() -> new IllegalArgumentException("El rfc" + rfc + " No Existe"));
+        return personaService.buscarPersonaPorRfc(rfc);
     }
 
-    // El unico metodo POST
     @PostMapping
     public PersonaModel registrarPersona(@Valid @RequestBody PersonaModel persona) {
-        // Al agregar @Valid, Spring validará el objeto antes de entrar aquí
         return personaService.registrarPersona(persona);
     }
 
-    // Todos los metodos PUT para actualizar los datos de la persona
     @PutMapping("/id/{id}")
     public PersonaModel actualizarPersona(@PathVariable String id, @Valid @RequestBody PersonaModel persona) {
         return personaService.actualizarPersonaPorId(id, persona);
@@ -77,7 +69,6 @@ import jakarta.validation.Valid;
         return personaService.actualizarPersonaPorRfc(rfc, persona);
     }
 
-    // Todos los metodos DELETE para eliminar los datos de la persona
     @DeleteMapping("/id/{id}")
     public boolean eliminarPersona(@PathVariable String id) {
         return personaService.eliminarPersona(id);
@@ -85,11 +76,11 @@ import jakarta.validation.Valid;
 
     @DeleteMapping("/curp/{curp}")
     public void eliminarPersonaPorCurp(@PathVariable String curp) {
-        personaRepository.deletePersonaPorCurp(curp);
+        personaService.eliminarPersonaPorCurp(curp);
     }
 
     @DeleteMapping("/rfc/{rfc}")
     public void eliminarPersonaPorRfc(@PathVariable String rfc) {
-        personaRepository.deletePersonaPorRFC(rfc);
+        personaService.eliminarPersonaPorRfc(rfc);
     }
 }

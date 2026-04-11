@@ -3,48 +3,34 @@ node_modules/
 
 # Firebase / credenciales (no subir al repositorio)
 serviceAccountKey.json
+src/main/resources/serviceAccountKey.json
 
 # Build (Maven)
 target/
 
-# IntelliJ / Cursor (JetBrains)
+# IDEs (IntelliJ, VS Code, Cursor)
 .idea/
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
+.vscode/
+*.iws
+*.iml
+*.ipr
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
 .sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
 bin/
 
-## Donde va la api ##
-src/main/resources/serviceAccountKey.json
+# Otros
+HELP.md
+.mvn/wrapper/maven-wrapper.jar
 *.class
-.settings/
+.DS_Store
