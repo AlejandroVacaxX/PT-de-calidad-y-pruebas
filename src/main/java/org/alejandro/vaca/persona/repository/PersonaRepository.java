@@ -411,18 +411,27 @@ public class PersonaRepository {
         } 
        
         try {
-           
-            Query query = firestore.collection(COLLECTION)
-                    .whereEqualTo("nombre", nombre)
-                    .whereEqualTo("apellidoPaterno", apellidoPaterno)
-                    .whereEqualTo("apellidoMaterno", apellidoMaterno);
-                    
+            Query query = firestore.collection(COLLECTION);
+        
+            if (nombre != null && !nombre.isEmpty()) {
+                query = query.whereEqualTo("nombre", nombre);
+            }
+        
+            if (apellidoPaterno != null && !apellidoPaterno.isEmpty()) {
+                query = query.whereEqualTo("apellidoPaterno", apellidoPaterno);
+            }
+        
+            if (apellidoMaterno != null && !apellidoMaterno.isEmpty()) {
+                query = query.whereEqualTo("apellidoMaterno", apellidoMaterno);
+            }
+        
             ApiFuture<QuerySnapshot> future = query.get();
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-    
+        
             List<PersonaModel> personasEncontradas = new ArrayList<>();
-                for (DocumentSnapshot document : documents) {
-                    personasEncontradas.add(new PersonaModel(
+        
+            for (DocumentSnapshot document : documents) {
+                personasEncontradas.add(new PersonaModel(
                     document.getId(),
                     document.getString("nombre"),
                     document.getString("apellidoPaterno"),
@@ -437,10 +446,11 @@ public class PersonaRepository {
                     document.getString("curp"),
                     document.getString("rfc"),
                     document.getDouble("imc")
-                    ));
-                    }    
+                ));
+            }
+        
             return personasEncontradas;
-            
+        
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException("Error al consultar personas: " + e.getMessage());
         }

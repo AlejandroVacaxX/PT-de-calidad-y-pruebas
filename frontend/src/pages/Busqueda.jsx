@@ -401,15 +401,8 @@ export default function Busqueda() {
                         Ayuda técnica
                     </h3>
                     <p className="text-sm text-slate-700 leading-relaxed mb-4">
-                        Puede realizar su búsqueda utilizando el ID interno del sistema, un CURP (18 caracteres), un RFC (13 caracteres), o ingresando los nombres y apellidos de la persona.
+                        Puede realizar su búsqueda utilizando el ID interno del sistema, un CURP (18 caracteres), un RFC (10 caracteres, sin homoclave), o ingresando los nombres y apellidos de la persona.
                     </p>
-                    <a
-                        href="#"
-                        className="inline-flex items-center gap-1 text-sm font-semibold text-blue-800 hover:underline"
-                        onClick={(e) => e.preventDefault()}
-                    >
-                        Manual de formatos →
-                    </a>
                     <FiHelpCircle
                         className="absolute -bottom-2 -right-2 w-40 h-40 text-blue-900/5 pointer-events-none"
                         aria-hidden
