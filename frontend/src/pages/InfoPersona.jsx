@@ -9,6 +9,11 @@ export default function InfoPersona() {
   const [editando, setEditando] = useState(false);
   const [formData, setFormData] = useState({});
 
+  const nombreMayuscula = (text) =>{
+    if(!text) return "";
+    return text.toLowerCase().split(" ").map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1)).join(" ");
+  }
+
   // Extraemos el ID de la URL
   const pathParts = window.location.pathname.split("/").filter(Boolean);
   const id = pathParts[pathParts.length - 1];
@@ -175,13 +180,15 @@ export default function InfoPersona() {
       <section className="bg-white p-8 rounded-2xl shadow-sm mb-6 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-6">
           <div className="w-24 h-24 bg-blue-900 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-inner">
-            {persona.nombre?.charAt(0)}{persona.apellidoPaterno?.charAt(0)}
+            {persona.nombre?.charAt(0).toUpperCase()}{persona.apellidoPaterno?.charAt(0).toUpperCase()}
           </div>
 
           <div>
             {!editando ? (
               <h1 className="text-3xl font-bold text-blue-900 leading-tight">
-                {persona.nombre} {persona.apellidoPaterno} {persona.apellidoMaterno}
+                {nombreMayuscula(persona.nombre)}{" "}
+                    {nombreMayuscula(persona.apellidoPaterno)}{" "}
+                    {nombreMayuscula(persona.apellidoMaterno)}
               </h1>
             ) : (
               <div className="flex gap-2">
@@ -250,7 +257,7 @@ export default function InfoPersona() {
             <div className="space-y-1">
               <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Genero</p>
               {!editando ? (
-                <p className="text-blue-900 font-semibold text-lg">{persona.genero}</p>
+                <p className="text-blue-900 font-semibold text-lg">{nombreMayuscula(persona.genero)}</p>
               ) : (
                 <select 
                   className="w-full p-2 border rounded-lg" 

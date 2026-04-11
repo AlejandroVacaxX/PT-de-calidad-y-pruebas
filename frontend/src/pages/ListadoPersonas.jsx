@@ -11,6 +11,11 @@ export default function ListadoPersonas() {
     navigate(path);
   };
 
+  const nombreMayuscula = (text) =>{
+    if(!text) return "";
+    return text.toLowerCase().split(" ").map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1)).join(" ");
+  }
+
   // Funcion para obtener la lista de personas desde el backend
   const obtenerPersonas = async () => {
     try {
@@ -78,12 +83,14 @@ export default function ListadoPersonas() {
                 <div>
                   <div className="flex justify-between items-start mb-2">
                     <span className="px-2 py-1 text-xs font-bold uppercase tracking-wider rounded bg-blue-100 text-blue-700">
-                      {persona.genero || "No especificado"}
+                      {nombreMayuscula(persona.genero) || "No especificado"}
                     </span>
                   </div>
                   <h2 className="text-xl font-bold text-blue-900 mb-1">
-                    {persona.nombre} {persona.apellidoPaterno} {persona.apellidoMaterno}
-                  </h2>
+                    {nombreMayuscula(persona.nombre)}{" "}
+                    {nombreMayuscula(persona.apellidoPaterno)}{" "}
+                    {nombreMayuscula(persona.apellidoMaterno)}
+                          </h2>
                   <p className="text-sm text-gray-500 mb-4">{persona.email}</p>
                 </div>
                 
