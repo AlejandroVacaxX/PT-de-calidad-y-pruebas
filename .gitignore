@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # Dependencies
 node_modules/
 
@@ -9,6 +10,8 @@ target/
 
 # IntelliJ / Cursor (JetBrains)
 .idea/
+=======
+>>>>>>> Stashed changes
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
@@ -48,3 +51,7 @@ bin/
 src/main/resources/serviceAccountKey.json
 *.class
 .settings/
+<<<<<<< Updated upstream
+=======
+target/
+>>>>>>> Stashed changes
