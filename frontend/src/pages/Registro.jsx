@@ -202,6 +202,7 @@ export default function Registro() {
                 type="date"
                 name="fechaDeNacimiento"
                 value={form.fechaDeNacimiento}
+                max={new Date().toISOString().split("T")[0]}
                 onChange={handleChange}
               />
             </div>

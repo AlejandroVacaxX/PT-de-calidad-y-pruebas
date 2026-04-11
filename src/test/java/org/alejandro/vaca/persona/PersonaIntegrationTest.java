@@ -348,7 +348,7 @@ public class PersonaIntegrationTest {
         })
         @DisplayName("Integración: Registro y cálculo de IMC parametrizado")
         void registroParametrizadoTest(Double peso, Double estatura, Double imcEsperado) throws Exception {
-                String personaJson = String.format("""
+                String personaJson = String.format(java.util.Locale.US,"""
                                 {
                                     "nombre": "Prueba",
                                     "apellidoPaterno": "Test",

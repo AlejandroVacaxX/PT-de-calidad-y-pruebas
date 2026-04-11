@@ -10,26 +10,6 @@ export const Topbar = ({ titulo = "Dashboard" }) => {
 
       {/* CONTROLES DERECHOS */}
       <div className="flex items-center gap-6">
-
-        {/* 1. Buscador */}
-        <div className="relative">
-          <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
-          <input
-            type="text"
-            placeholder="Buscar espacios..."
-            className="bg-gray-100 text-gray-700 pl-10 pr-4 py-2.5 rounded-xl outline-none focus:ring-2 focus:ring-primary w-72 transition-all"
-          />
-        </div>
-
-        {/* 2. Ícono de Notificaciones */}
-        <button className="relative text-gray-500 hover:text-primary transition-colors">
-          <FiBell className="text-2xl" />
-          {/* Indicador de notificación nueva (puntito rojo) */}
-          <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-        </button>
-
-        {/* 3. Línea separadora vertical */}
-        <div className="h-8 w-px bg-gray-300"></div>
       </div>
     </div>
   );

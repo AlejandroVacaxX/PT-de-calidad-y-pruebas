@@ -223,8 +223,7 @@ export default function Busqueda() {
         <div className="p-8 max-w-6xl mx-auto">
             <header className="mb-8">
                 <h1
-                    className="text-3xl font-bold tracking-tight mb-2"
-                    style={{ color: PRIMARY }}
+                   className="text-3xl font-bold text-blue-900"
                 >
                     Consulta por Identificador
                 </h1>
