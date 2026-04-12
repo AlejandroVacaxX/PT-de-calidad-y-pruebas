@@ -1,9 +1,15 @@
+
+
 package org.alejandro.vaca.persona.config;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
@@ -17,21 +23,30 @@ public class FirebaseConfig {
     @Bean
     public Firestore firestore() {
         try {
-            if (FirebaseApp.getApps().isEmpty()) {
-                FileInputStream serviceAccount = new FileInputStream("src/main/resources/serviceAccountKey.json");
+            InputStream serviceAccount;
+            String firebaseEnv = System.getenv("FIREBASE_CREDENTIALS");
 
-                FirebaseOptions options = new FirebaseOptions.Builder()
-                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                        .build();
-
-                FirebaseApp.initializeApp(options);
-
+            if (firebaseEnv != null && !firebaseEnv.isBlank()) {
+                System.out.println("Cargando Firebase desde Variable de Entorno...");
+                serviceAccount = new ByteArrayInputStream(firebaseEnv.getBytes(StandardCharsets.UTF_8));
+            } else {
+            
+                System.out.println("Cargando Firebase desde archivo local...");
+                serviceAccount = new ClassPathResource("serviceAccountKey.json").getInputStream();
             }
-            return FirestoreClient.getFirestore();
 
+            FirebaseOptions options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build();
+
+            if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseApp.initializeApp(options);
+            }
+
+            return FirestoreClient.getFirestore();
+            
         } catch (Exception e) {
-            // ¡Esto imprimirá la verdadera causa del problema en la consola!
-            System.err.println("¡¡ERROR CRÍTICO AL CONECTAR CON FIREBASE!! -> " + e.getMessage());
+            e.printStackTrace();
             throw new IllegalStateException("Falló la configuración de Firebase", e);
         }
     }
