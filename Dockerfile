@@ -1,33 +1,27 @@
-# ==========================================
-# Etapa 1: Construcción (Build)
-# ==========================================
-FROM eclipse-temurin:21-jdk-alpine AS build
+# ETAPA 1: Compilación
+FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 
-# Copiamos los archivos de configuración de Maven
+# Copiamos archivos de configuración de Maven
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
-
-# Descargamos las dependencias (esto ayuda a que los próximos builds sean rápidos)
 RUN chmod +x mvnw
+
+# Descargamos dependencias 
 RUN ./mvnw dependency:go-offline
 
-# Copiamos el código fuente y compilamos el proyecto
+# Copiamos el código fuente y compilamos
 COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
-# ==========================================
-# Etapa 2: Ejecución (Run)
-# ==========================================
-FROM eclipse-temurin:21-jdk-alpine
+# ETAPA 2: Ejecución
+FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
-# Copiamos el .jar generado en la etapa anterior (Etapa 1)
-# IMPORTANTE: El nombre del JAR debe coincidir con el que genera tu pom.xml
+# Copiamos el JAR generado
 COPY --from=build /app/target/*.jar app.jar
 
-# Exponemos el puerto que usa Render
 EXPOSE 8080
 
-# Comando para arrancar la aplicación
+# Comando de arranque
 ENTRYPOINT ["java", "-jar", "app.jar"]
