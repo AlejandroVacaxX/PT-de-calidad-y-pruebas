@@ -22,7 +22,7 @@ public class Persona{
         SpringApplication.run(Persona.class, args);
         System.out.println("Aplicacion Persona Inicializada Correctamente");
         System.out.println("Endpoint Disponible En:");
-        System.out.println("http://localhost:8080/personas/personas-api");
+        System.out.println("http://localhost:8080/");
       
     }
     @Bean
