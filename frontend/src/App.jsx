@@ -23,22 +23,22 @@ function App() {
   return (
     <>
       {(currentPath === '/' || currentPath === '/listado' || currentPath === '/dashboard') &&(
-        <MainLayout>
+        <MainLayout titulo="Listado de Personas">
           <ListadoPersonas/>
         </MainLayout>
       )}
       {currentPath === '/registro' && (
-        <MainLayout>
+        <MainLayout titulo="Nuevo Registro de Persona">
           <Registro/>
         </MainLayout>
       )}
       {currentPath.startsWith('/infopersona') &&(
-        <MainLayout>
+        <MainLayout titulo="Detalles de Persona">
           <InfoPersona/>
         </MainLayout>
       )}
       {currentPath === '/busqueda' && (
-          <MainLayout>
+          <MainLayout titulo="Búsqueda Avanzada">
             <Busqueda/>
           </MainLayout>
       )}

@@ -131,7 +131,7 @@ export default function InfoPersona() {
   }
 
   return (
-    <main className="p-8 bg-gray-100 min-h-screen">
+    <div className="p-8 bg-gray-100 min-h-full">
       {/* ACCIONES SUPERIORES */}
       <div className="flex justify-between items-center mb-6">
         <button
@@ -395,6 +395,6 @@ export default function InfoPersona() {
         </aside>
 
       </div>
-    </main>
+    </div>
   );
 }

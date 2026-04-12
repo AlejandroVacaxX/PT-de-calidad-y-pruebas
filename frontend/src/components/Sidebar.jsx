@@ -7,7 +7,7 @@ export const Sidebar = () => {
     navigate(path);
   };
   return (
-      <div className="w-45 h-screen bg-white border-r border-gray-200 flex flex-col justify-between">
+      <div className="w-64 bg-white border-r border-gray-200 flex flex-col justify-between overflow-hidden">
 
         <div>
           {/* SECCIÓN DE LOGOS (Reemplazo del texto anterior por los PNG) */}

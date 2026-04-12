@@ -100,7 +100,7 @@ export default function Registro() {
   };
 
   return (
-    <main className="p-8 bg-gray-100 min-h-screen">
+    <div className="p-8 bg-gray-100 min-h-full">
 
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
@@ -308,6 +308,6 @@ export default function Registro() {
         </section>
 
       </div>
-    </main>
+    </div>
   );
 }

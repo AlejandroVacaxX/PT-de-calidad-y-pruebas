@@ -41,7 +41,7 @@ export default function ListadoPersonas() {
   }, []);
 
   return (
-    <main className="p-8 bg-gray-100 min-h-screen">
+    <div className="p-8 bg-gray-100 min-h-full">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-blue-900">Listado de Personas</h1>
@@ -113,6 +113,6 @@ export default function ListadoPersonas() {
           )}
         </div>
       )}
-    </main>
+    </div>
   );
 }
