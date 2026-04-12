@@ -1,11 +1,33 @@
-# 1. Usar una imagen oficial de Java
+# ==========================================
+# Etapa 1: Construcción (Build)
+# ==========================================
+FROM eclipse-temurin:21-jdk-alpine AS build
+WORKDIR /app
+
+# Copiamos los archivos de configuración de Maven
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
+
+# Descargamos las dependencias (esto ayuda a que los próximos builds sean rápidos)
+RUN chmod +x mvnw
+RUN ./mvnw dependency:go-offline
+
+# Copiamos el código fuente y compilamos el proyecto
+COPY src ./src
+RUN ./mvnw clean package -DskipTests
+
+# ==========================================
+# Etapa 2: Ejecución (Run)
+# ==========================================
 FROM eclipse-temurin:21-jdk-alpine
+WORKDIR /app
 
-# 2. Copiar CUALQUIER archivo .jar que esté en target y renombrarlo a app.jar
-COPY target/*.jar app.jar
+# Copiamos el .jar generado en la etapa anterior (Etapa 1)
+# IMPORTANTE: El nombre del JAR debe coincidir con el que genera tu pom.xml
+COPY --from=build /app/target/*.jar app.jar
 
-# 3. Exponer el puerto
+# Exponemos el puerto que usa Render
 EXPOSE 8080
 
-# 4. Comando para ejecutar tu app
-ENTRYPOINT ["java","-jar","/app.jar"]
+# Comando para arrancar la aplicación
+ENTRYPOINT ["java", "-jar", "app.jar"]
