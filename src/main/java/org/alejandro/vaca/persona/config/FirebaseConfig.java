@@ -29,11 +29,17 @@ public class FirebaseConfig {
             if (firebaseJson != null && !firebaseJson.equals("null") && !firebaseJson.isBlank()) {
                 System.out.println("✅ LOG: Iniciando con VARIABLE DE ENTORNO");
                 serviceAccount = new ByteArrayInputStream(firebaseJson.getBytes(StandardCharsets.UTF_8));
-            } else {
-                System.out.println("❌ LOG: Variable no encontrada, buscando ARCHIVO LOCAL");
-                serviceAccount = new ClassPathResource("serviceAccountKey.json").getInputStream();
+            }else {
+                System.out.println("⚠️ Variable no encontrada. Intentando cargar Secret File externo...");
+                // Render pone los Secret Files en la raíz del contenedor
+                java.io.File file = new java.io.File("serviceAccountKey.json");
+                if (file.exists()) {
+                    serviceAccount = new java.io.FileInputStream(file);
+                } else {
+                    // Si no es un Secret File, intenta buscarlo como recurso interno (IDE)
+                    serviceAccount = new ClassPathResource("serviceAccountKey.json").getInputStream();
+                }
             }
-
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
