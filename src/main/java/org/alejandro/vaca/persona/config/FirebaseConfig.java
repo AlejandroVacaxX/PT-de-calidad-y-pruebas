@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Base64;
 
 @Configuration
 public class FirebaseConfig {
@@ -20,15 +20,15 @@ public class FirebaseConfig {
     public Firestore firestore() {
         try {
             InputStream serviceAccount;
-            String firebaseEnv = System.getenv("FIREBASE_CREDENTIALS");
+            
+            // RUTA ABSOLUTA DE RENDER PARA DOCKER
+            File renderSecret = new File("/etc/secrets/serviceAccountKey.json");
 
-            if (firebaseEnv != null && !firebaseEnv.isBlank()) {
-                System.out.println("✅ LOG: Decodificando credenciales Base64 desde Variable de Entorno...");
-                // Magia: Convertimos el Base64 de vuelta a un archivo en memoria
-                byte[] decodedBytes = Base64.getDecoder().decode(firebaseEnv.trim());
-                serviceAccount = new ByteArrayInputStream(decodedBytes);
+            if (renderSecret.exists()) {
+                System.out.println("✅ LOG: ¡Bóveda de Render encontrada! Cargando credenciales...");
+                serviceAccount = new FileInputStream(renderSecret);
             } else {
-                System.out.println("⚠️ LOG: Variable vacía. Usando archivo local (para pruebas en el IDE)...");
+                System.out.println("⚠️ LOG: No se encontró /etc/secrets/. Usando archivo local (IDE)...");
                 serviceAccount = new ClassPathResource("serviceAccountKey.json").getInputStream();
             }
 
