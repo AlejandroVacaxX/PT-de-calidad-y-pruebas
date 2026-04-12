@@ -29,23 +29,32 @@ public class FirebaseConfig {
             if (firebaseJson != null && !firebaseJson.equals("null") && !firebaseJson.isBlank()) {
                 System.out.println("✅ LOG: Iniciando con VARIABLE DE ENTORNO");
                 serviceAccount = new ByteArrayInputStream(firebaseJson.getBytes(StandardCharsets.UTF_8));
-            }else {
-                System.out.println("⚠️ Variable no encontrada. Intentando cargar Secret File externo...");
-                // Render pone los Secret Files en la raíz del contenedor
-                java.io.File file = new java.io.File("serviceAccountKey.json");
-                if (file.exists()) {
-                    serviceAccount = new java.io.FileInputStream(file);
-                } else {
-                    // Si no es un Secret File, intenta buscarlo como recurso interno (IDE)
-                    serviceAccount = new ClassPathResource("serviceAccountKey.json").getInputStream();
+            } else {
+                System.out.println("⚠️ Variable no encontrada. Buscando archivo físico...");
+                
+                // Lista de rutas posibles donde Render/Docker pueden guardar el archivo
+                String[] posiblesRutas = {
+                    "serviceAccountKey.json",                  // Raíz del contenedor
+                    "/app/serviceAccountKey.json",             // Ruta estándar de Render
+                    "/app/src/main/resources/serviceAccountKey.json",
+                    "etc/secrets/serviceAccountKey.json"       // A veces Render los monta aquí
+                };
+            
+                InputStream is = null;
+                for (String ruta : posiblesRutas) {
+                    java.io.File file = new java.io.File(ruta);
+                    if (file.exists()) {
+                        System.out.println("✅ ¡ARCHIVO ENCONTRADO EN: " + ruta + "!");
+                        is = new java.io.FileInputStream(file);
+                        break;
+                    }
                 }
-            }
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .build();
-
-            if (FirebaseApp.getApps().isEmpty()) {
-                FirebaseApp.initializeApp(options);
+            
+                if (is == null) {
+                    System.out.println("❌ No se encontró archivo físico. Intentando ClassPathResource...");
+                    is = new ClassPathResource("serviceAccountKey.json").getInputStream();
+                }
+                serviceAccount = is;
             }
 
             return FirestoreClient.getFirestore();
