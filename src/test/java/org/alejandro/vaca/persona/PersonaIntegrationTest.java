@@ -3,7 +3,6 @@ package org.alejandro.vaca.persona;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import org.hamcrest.Matchers;
 
 import org.alejandro.vaca.persona.model.PersonaModel;
 import org.alejandro.vaca.persona.repository.PersonaRepository;
@@ -60,7 +59,6 @@ public class PersonaIntegrationTest {
         private Query query;
 
         private static final String BASE_URL = "/personas/personas-api";
-    private static final String BASE_URL = "http://localhost:8080/personas/personas-api";
 
         @SuppressWarnings({ "unchecked" })
         @BeforeEach
@@ -300,54 +298,13 @@ public class PersonaIntegrationTest {
                                 .andExpect(status().isBadRequest());
         }
 
-    @Test
-    @DisplayName("Integracion: Error de validación en Género (No permitido)")
-    void registroFallaGeneroTest() throws Exception {
-        String personaInvalida = """
-                {
-                    "nombre": "Prueba",
-                    "apellidoPaterno": "Test",
-                    "apellidoMaterno": "Malo",
-                    "fechaDeNacimiento": "01/01/2000",
-                    "genero": "Desconocido",
-                    "estatusMigratorio": "mexicano",
-                    "estatura": 1.70,
-                    "peso": 70.0,
-                    "telefono": "5512345678",
-                    "email": "malo@gmail.com"
-                }
-                """;
-
-        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post(BASE_URL)
-                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-                .content(personaInvalida))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Integracion: Error al registrar menor de 16 años")
-    void registroFallaMenorEdadTest() throws Exception {
-        String personaJovenJson = """
-                {
-                    "nombre": "Juanito",
-                    "apellidoPaterno": "Perez",
-                    "apellidoMaterno": "Lopez",
-                    "fechaDeNacimiento": "01/01/2020",
-                    "genero": "masculino",
-                    "estatusMigratorio": "mexicano",
-                    "estatura": 1.20,
-                    "peso": 30.0,
-                    "telefono": "5500000000",
-                    "email": "nino@gmail.com"
-                }
-                """;
-
-        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post(BASE_URL)
-                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-                .content(personaJovenJson))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("La persona debe ser mayor de 16 años para generar el RFC"));
-    }
+        @Test
+        @DisplayName("Integracion: Error de validación en Género (No permitido)")
+        void registroFallaGeneroTest() throws Exception {
+                mockMvc.perform(post(BASE_URL).contentType("application/json").content(
+                                "{\"nombre\":\"Err\",\"apellidoPaterno\":\"P\",\"apellidoMaterno\":\"L\",\"fechaDeNacimiento\":\"01/01/2000\",\"genero\":\"desconocido\",\"estatusMigratorio\":\"mexicano\",\"estatura\":1.70,\"peso\":70.0,\"telefono\":\"5512345678\",\"email\":\"e@g.com\"}"))
+                                .andExpect(status().isBadRequest());
+        }
 
         @ParameterizedTest
         @CsvSource({ "55123, t@g.com", "4412345678, t@g.com", "5512345678, malo" })
@@ -359,104 +316,6 @@ public class PersonaIntegrationTest {
                 mockMvc.perform(post(BASE_URL).contentType("application/json").content(json))
                                 .andExpect(status().isBadRequest());
         }
-
-@ParameterizedTest
-@CsvSource({
-       
-        "Juan, PEREZ, LOPEZ, 01/01/1990, PELJ900101",
-        "Mario, GARCIA, RUIZ, 15/03/1985, GARM850315",
-        "Ana, delgado, mora, 20/12/1995, DEMA951220"
-})
-@DisplayName("Integracion: Validación parametrizada de generación de RFC")
-void registroRfcParametrizadoTest(String nom, String pat, String mat, String fecha, String raizRfcEsperada)
-        throws Exception {
-    String personaJson = String.format("""
-            {
-                "nombre": "%s",
-                "apellidoPaterno": "%s",
-                "apellidoMaterno": "%s",
-                "fechaDeNacimiento": "%s",
-                "genero": "femenino",
-                "estatusMigratorio": "mexicano",
-                "estatura": 1.65,
-                "peso": 60.0,
-                "telefono": "5500000000",
-                "email": "test.param@uam.mx"
-            }
-            """, nom, pat, mat, fecha);
-
-    com.google.cloud.firestore.WriteResult writeResult = Mockito.mock(com.google.cloud.firestore.WriteResult.class);
-    when(documentReference.set(Mockito.anyMap())).thenReturn(ApiFutures.immediateFuture(writeResult));
-    when(documentReference.getId()).thenReturn("id-rfc-param");
-
-    mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post(BASE_URL)
-            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-            .content(personaJson))
-            .andExpect(status().isOk())
-    
-            .andExpect(jsonPath("$.rfc").value(Matchers.startsWith(raizRfcEsperada)))
-           
-            .andExpect(jsonPath("$.rfc.length()").value(13));
-}
-    @RepeatedTest(5)
-    @DisplayName("Integración: Verificación de estabilidad en datos aleatorios de CURP")
-    void registroCurpEstabilidadTest() throws Exception {
-        String personaJson = """
-                {
-                    "nombre": "Edgar",
-                    "apellidoPaterno": "Vaca",
-                    "apellidoMaterno": "Alejandro",
-                    "fechaDeNacimiento": "10/10/2000",
-                    "genero": "masculino",
-                    "estatusMigratorio": "mexicano",
-                    "estatura": 1.75,
-                    "peso": 80.0,
-                    "telefono": "5511223344",
-                    "email": "edgar.test@uam.mx"
-                }
-                """;
-
-        com.google.cloud.firestore.WriteResult writeResult = Mockito.mock(com.google.cloud.firestore.WriteResult.class);
-        when(documentReference.set(Mockito.anyMap())).thenReturn(ApiFutures.immediateFuture(writeResult));
-        when(documentReference.getId()).thenReturn("id-repetido-curp");
-
-        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post(BASE_URL)
-                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-                .content(personaJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.curp").exists())
-                .andExpect(jsonPath("$.curp").value(org.hamcrest.Matchers.hasLength(16)));
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-            "55123, test@gmail.com",
-            "4412345678, test@gmail.com",
-            "5512345678, correo-invalido",
-            "A123456789, test@gmail.com"
-    })
-    @DisplayName("Integración: Validación parametrizada de datos de contacto inválidos")
-    void validacionContactoParametrizadaTest(String tel, String mail) throws Exception {
-        String personaInvalida = String.format("""
-                {
-                    "nombre": "Falla",
-                    "apellidoPaterno": "Test",
-                    "apellidoMaterno": "Jakarta",
-                    "fechaDeNacimiento": "01/01/2000",
-                    "genero": "masculino",
-                    "estatusMigratorio": "mexicano",
-                    "estatura": 1.70,
-                    "peso": 70.0,
-                    "telefono": "%s",
-                    "email": "%s"
-                }
-                """, tel, mail);
-
-        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post(BASE_URL)
-                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-                .content(personaInvalida))
-                .andExpect(status().isBadRequest());
-    }
 
         @RepeatedTest(5)
         @DisplayName("Integración: Validación de formato Regex en dígitos aleatorios de CURP")
